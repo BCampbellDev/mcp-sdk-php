@@ -13,7 +13,7 @@
         "ext-curl": "*",
         "ext-json": "*",
         "psr/log": "^1.1 | ^2.0 | ^3.0",
-        "monolog/monolog": "^2.10"
+        "monolog/monolog": "^2.8.0"
     },
     "suggest": {
         "ext-pcntl": "For better process handling in CLI environments"
