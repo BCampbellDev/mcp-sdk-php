@@ -36,8 +36,7 @@
  use Psr\Log\NullLogger;
  use RuntimeException;
  use InvalidArgumentException;
- use CurlHandle;
- 
+
  /**
   * Implements the Streamable HTTP transport for MCP.
   * 

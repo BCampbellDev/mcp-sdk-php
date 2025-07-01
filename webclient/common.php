@@ -31,7 +31,7 @@ declare(strict_types=1);
 
 // Error reporting
 error_reporting(E_ALL);
-ini_set('display_errors', 0); // Don't display errors directly, we'll handle them
+ini_set('display_errors', '0'); // Don't display errors directly, we'll handle them
 
 // Initialize session if not already started
 if (session_status() === PHP_SESSION_NONE) {

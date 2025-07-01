@@ -10,16 +10,15 @@
     },
     "require": {
         "php": ">=7.4",
-        "psr/log": "^2.0 ||^3.0",
         "ext-curl": "*",
-        "ext-json": "*"
+        "ext-json": "*",
+        "psr/log": "^1.1 | ^2.0 | ^3.0",
+        "monolog/monolog": "^2.10"
     },
     "suggest": {
-        "ext-pcntl": "For better process handling in CLI environments",
-        "monolog/monolog": "^3.0 - For debugging and logging capabilities"
+        "ext-pcntl": "For better process handling in CLI environments"
     },
     "require-dev": {
-        "phpunit/phpunit": "^10.0",
         "rector/rector": "^2.1"
     }
 }

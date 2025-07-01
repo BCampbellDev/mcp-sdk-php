@@ -29,6 +29,7 @@ declare(strict_types=1);
 
 namespace Mcp\Shared;
 
+use Mcp\Types\JsonRpcErrorObject;
 use Mcp\Types\JsonRpcMessage;
 use Mcp\Types\RequestId;
 use Mcp\Shared\ErrorData;
@@ -200,9 +201,9 @@ abstract class BaseSession {
                 '2.0',
                 $requestId,
                 new JsonRpcErrorObject(
-                    code: $response->code,
-                    message: $response->message,
-                    data: $response->data ?? null
+                    $response->code,
+                    $response->message,
+                    $response->data ?? null
                 )
             );
             $message = new JsonRpcMessage($jsonRpcError);

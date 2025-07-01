@@ -295,10 +295,26 @@ class StdioTransport {
             /**
              * Simple check if $data is a "list array" (i.e. numeric keys).
              */
-            private function isListArray(array $data): bool {
-                return $arrayIsListFunction($data);
+            private function isListArray(array $array): bool {
+                //usava a $arrayIsListFunction
+                if (function_exists('array_is_list')) {
+                    return array_is_list($array);
+                }
+                if ($array === []) {
+                    return true;
+                }
+                $current_key = 0;
+                foreach ($array as $key => $noop) {
+                    if ($key !== $current_key) {
+                        return false;
+                    }
+                    ++$current_key;
+                }
+                return true;
                 // or older PHP: return array_keys($data) === range(0, count($data)-1);
             }
+
+
 
             /**
              * Parses notification parameters into a NotificationParams object.

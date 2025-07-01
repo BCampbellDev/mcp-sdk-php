@@ -31,6 +31,74 @@ composer require logiscape/mcp-sdk-php
 * ext-pcntl (optional, recommended for CLI environments)
 * monolog/monolog (optional, used by example clients/servers for logging)
 
+## Docker Development Environment
+
+A Docker Compose configuration is included for easy development with PHP 7.4 and all required extensions.
+
+> **Note:** While the package officially requires PHP 8.1+, this Docker configuration uses PHP 7.4 with the required extensions (curl and json) for specific development scenarios. For production use, please ensure you're using PHP 8.1 or higher.
+
+### Starting the Docker Environment
+
+```bash
+docker-compose up -d
+```
+
+This will start a PHP 7.4 server with curl and json extensions pre-installed.
+
+### Verifying the Docker Environment
+
+A test script is included to verify that the Docker environment is properly configured:
+
+```bash
+docker-compose exec php php docker-test.php
+```
+
+This will display information about the PHP version, installed extensions, and Composer setup.
+
+### Running PHP Scripts in Docker
+
+```bash
+docker-compose exec php php your-script.php
+```
+
+### Using Composer in Docker
+
+```bash
+docker-compose exec php composer install
+docker-compose exec php composer require some/package
+```
+
+### Entering the Bash Shell for Manual Execution
+
+For manual execution of commands in the Docker environment:
+
+```bash
+docker-compose exec php bash
+```
+
+Once inside the container, you can run PHP scripts and Composer commands directly:
+
+```bash
+# Inside the container
+php docker-test.php
+composer install
+php -v
+```
+
+### Accessing the Web Server
+
+The Docker setup includes a simple web server accessible at:
+
+```
+http://localhost:8000
+```
+
+### Stopping the Docker Environment
+
+```bash
+docker-compose down
+```
+
 ## Basic Usage
 
 ### Creating an MCP Server

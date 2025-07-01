@@ -32,6 +32,7 @@ namespace Mcp\Server;
 use Mcp\Shared\BaseSession;
 use Mcp\Shared\RequestResponder;
 use Mcp\Shared\Version;
+use Mcp\Types\CallToolResult;
 use Mcp\Types\JsonRpcMessage;
 use Mcp\Types\LoggingLevel;
 use Mcp\Types\Implementation;
@@ -46,6 +47,7 @@ use Mcp\Server\Transport\Transport;
 use Mcp\Types\JSONRPCResponse;
 use Mcp\Types\JSONRPCError;
 use Mcp\Types\JSONRPCNotification;
+use Mcp\Types\Tool;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use RuntimeException;
@@ -510,9 +512,9 @@ class ServerSession extends BaseSession {
             
             // Create a new result with the adapted content
             return new CallToolResult(
-                content: $adaptedContent,
-                isError: $result->isError,
-                _meta: $result->_meta
+                $adaptedContent,
+                $result->isError,
+                $result->_meta
             );
         }
         
@@ -555,9 +557,9 @@ class ServerSession extends BaseSession {
         if (version_compare($this->negotiatedProtocolVersion, '2025-03-26', '<') && $tool->annotations !== null) {
             // Create a new tool without annotations
             return new Tool(
-                name: $tool->name,
-                inputSchema: $tool->inputSchema,
-                description: $tool->description
+                $tool->name,
+                $tool->inputSchema,
+                $tool->description
             );
         }
         
@@ -610,7 +612,7 @@ class ServerSession extends BaseSession {
         //$this->stop();
     }
 
-    protected function writeMessage(JsonRpcMessage $message): void {
+    public function writeMessage(JsonRpcMessage $message): void {
         $innerMessage = $message->message;
         
         // Apply adapters for responses based on client protocol version

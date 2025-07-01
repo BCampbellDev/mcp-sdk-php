@@ -2,3 +2,7 @@
 /vendor/
 composer.lock
 .idea/
+
+# Docker development files
+docker-compose.yml
+docker-test.php

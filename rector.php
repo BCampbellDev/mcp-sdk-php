@@ -6,12 +6,13 @@ use Rector\Config\RectorConfig;
 use Rector\Set\ValueObject\DowngradeSetList;
 
 return static function (RectorConfig $rectorConfig): void {
+    $rectorConfig->skip([
+        __DIR__ . '/vendor'
+                        ]);
     $rectorConfig->paths([
-        __DIR__ . '/src',
-        __DIR__ . '/examples',
-        __DIR__ . '/webclient',
-    ]);
+        __DIR__
 
+    ]);
 
     $rectorConfig->sets([
         DowngradeSetList::PHP_81,

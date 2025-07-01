@@ -49,7 +49,7 @@ abstract class Capabilities implements McpModel {
         $this->experimental = $experimental;
     }
 
-    public static function fromArray(array $data): self {
+/*    public static function fromArray(array $data): self {
         $experimentalData = $data['experimental'] ?? null;
         unset($data['experimental']);
 
@@ -67,7 +67,7 @@ abstract class Capabilities implements McpModel {
 
         $obj->validate();
         return $obj;
-    }
+    }*/
 
     public function validate(): void {
         if ($this->experimental !== null) {

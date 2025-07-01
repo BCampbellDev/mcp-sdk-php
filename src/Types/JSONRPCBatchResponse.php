@@ -28,7 +28,7 @@ declare(strict_types=1);
 
 namespace Mcp\Types;
 
-class JSONRPCBatchResponse implements McpModel, \JsonSerializable {
+class JSONRPCBatchResponse implements McpModel {
     use ExtraFieldsTrait;
 
     /** @var array<JSONRPCResponse|JSONRPCError> */
