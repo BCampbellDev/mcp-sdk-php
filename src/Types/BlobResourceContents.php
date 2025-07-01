@@ -33,11 +33,17 @@ namespace Mcp\Types;
  * Binary resource contents
  */
 class BlobResourceContents extends ResourceContents {
+    /**
+     * @readonly
+     * @var string
+     */
+    public $blob;
     public function __construct(
-        public readonly string $blob,
+        string $blob,
         string $uri,
-        ?string $mimeType = null,
+        ?string $mimeType = null
     ) {
+        $this->blob = $blob;
         parent::__construct($uri, $mimeType);
     }
 

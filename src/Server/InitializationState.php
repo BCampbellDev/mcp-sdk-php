@@ -29,12 +29,9 @@ declare(strict_types=1);
 
 namespace Mcp\Server;
 
-/**
- * Enumeration to represent the initialization state of the server session.
- */
-enum InitializationState: int
+class InitializationState
 {
-    case NotInitialized = 1;
-    case Initializing = 2;
-    case Initialized = 3;
+    public const NotInitialized = 1;
+    public const Initializing = 2;
+    public const Initialized = 3;
 }

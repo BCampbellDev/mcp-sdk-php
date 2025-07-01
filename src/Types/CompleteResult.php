@@ -34,10 +34,16 @@ namespace Mcp\Types;
  * completion: { values: string[], total?: number, hasMore?: boolean }
  */
 class CompleteResult extends Result {
+    /**
+     * @readonly
+     * @var \Mcp\Types\CompletionObject
+     */
+    public $completion;
     public function __construct(
-        public readonly CompletionObject $completion,
-        ?Meta $_meta = null,
+        CompletionObject $completion,
+        ?Meta $_meta = null
     ) {
+        $this->completion = $completion;
         parent::__construct($_meta);
     }
 

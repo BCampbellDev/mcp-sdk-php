@@ -39,12 +39,23 @@ namespace Mcp\Types;
  * }
  */
 class ServerResourcesCapability implements McpModel {
+    /**
+     * @readonly
+     * @var bool|null
+     */
+    public $listChanged;
+    /**
+     * @readonly
+     * @var bool|null
+     */
+    public $subscribe;
     use ExtraFieldsTrait;
 
-    public function __construct(
-        public readonly ?bool $listChanged = null,
-        public readonly ?bool $subscribe = null,
-    ) {}
+    public function __construct(?bool $listChanged = null, ?bool $subscribe = null)
+    {
+        $this->listChanged = $listChanged;
+        $this->subscribe = $subscribe;
+    }
 
     public static function fromArray(array $data): self {
         $listChanged = $data['listChanged'] ?? null;
@@ -53,8 +64,8 @@ class ServerResourcesCapability implements McpModel {
         unset($data['listChanged'], $data['subscribe']);
 
         $obj = new self(
-            listChanged: $listChanged === null ? null : (bool)$listChanged,
-            subscribe: $subscribe === null ? null : (bool)$subscribe
+            $listChanged === null ? null : (bool)$listChanged,
+            $subscribe === null ? null : (bool)$subscribe
         );
 
         foreach ($data as $k => $v) {
@@ -69,7 +80,10 @@ class ServerResourcesCapability implements McpModel {
         // No required fields.
     }
 
-    public function jsonSerialize(): mixed {
+    /**
+     * @return mixed
+     */
+    public function jsonSerialize() {
         $data = [];
         if ($this->listChanged !== null) {
             $data['listChanged'] = $this->listChanged;

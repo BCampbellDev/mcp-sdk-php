@@ -33,11 +33,16 @@ namespace Mcp\Types;
  * Similar to RequestParams, it can have `_meta?: object` and arbitrary fields.
  */
 class NotificationParams implements McpModel {
+    /**
+     * @var \Mcp\Types\Meta|null
+     */
+    public $_meta;
     use ExtraFieldsTrait;
 
-    public function __construct(
-        public ?Meta $_meta = null,
-    ) {}
+    public function __construct(?Meta $_meta = null)
+    {
+        $this->_meta = $_meta;
+    }
 
     public function validate(): void {
         if ($this->_meta !== null) {
@@ -45,7 +50,10 @@ class NotificationParams implements McpModel {
         }
     }
 
-    public function jsonSerialize(): mixed {
+    /**
+     * @return mixed
+     */
+    public function jsonSerialize() {
         $data = [];
         
         // If $_meta is non-null, let it be serialized, and only add if not empty

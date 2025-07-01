@@ -39,15 +39,26 @@ namespace Mcp\Types;
  * }
  */
 class JSONRPCRequest extends Request {
+    /**
+     * @readonly
+     * @var string
+     */
+    public $jsonrpc;
+    /**
+     * @var \Mcp\Types\RequestId
+     */
+    public $id;
     use ExtraFieldsTrait;
 
     public function __construct(
-        public readonly string $jsonrpc,
-        public RequestId $id,
+        string $jsonrpc,
+        RequestId $id,
         ?RequestParams $params = null,
-        string $method = '',
+        string $method = ''
     ) {
-        parent::__construct(method: $method, params: $params);
+        $this->jsonrpc = $jsonrpc;
+        $this->id = $id;
+        parent::__construct($method, $params);
     }
 
     public function validate(): void {
@@ -63,7 +74,10 @@ class JSONRPCRequest extends Request {
         }
     }
 
-    public function jsonSerialize(): mixed {
+    /**
+     * @return mixed
+     */
+    public function jsonSerialize() {
         $data = parent::jsonSerialize();
         $data['jsonrpc'] = $this->jsonrpc;
         $data['id'] = $this->id;

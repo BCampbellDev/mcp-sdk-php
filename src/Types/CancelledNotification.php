@@ -32,10 +32,21 @@ namespace Mcp\Types;
  * Notification for cancelled requests
  */
 class CancelledNotification extends Notification {
+    /**
+     * @readonly
+     * @var \Mcp\Types\RequestId
+     */
+    public $requestId;
+    /**
+     * @var string|null
+     */
+    public $reason;
     public function __construct(
-        public readonly RequestId $requestId,
-        public ?string $reason = null,
+        RequestId $requestId,
+        ?string $reason = null
     ) {
+        $this->requestId = $requestId;
+        $this->reason = $reason;
         parent::__construct('notifications/cancelled');
     }
 

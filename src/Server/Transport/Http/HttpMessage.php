@@ -39,42 +39,42 @@ class HttpMessage
      *
      * @var array<string, string>
      */
-    private array $headers = [];
+    private $headers = [];
     
     /**
      * HTTP status code (for responses).
      *
      * @var int
      */
-    private int $statusCode = 200;
+    private $statusCode = 200;
     
     /**
      * Request/response body.
      *
      * @var string|null
      */
-    private ?string $body;
+    private $body;
     
     /**
      * HTTP method (for requests).
      *
      * @var string|null
      */
-    private ?string $method = null;
+    private $method;
     
     /**
      * Request URI (for requests).
      *
      * @var string|null
      */
-    private ?string $uri = null;
+    private $uri;
     
     /**
      * Request query parameters.
      *
      * @var array<string, string>
      */
-    private array $queryParams = [];
+    private $queryParams = [];
     
     /**
      * Constructor.

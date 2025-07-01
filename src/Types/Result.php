@@ -33,11 +33,16 @@ namespace Mcp\Types;
  * Schema: result objects can have `_meta?: object` and arbitrary fields
  */
 class Result implements McpModel {
+    /**
+     * @var \Mcp\Types\Meta|null
+     */
+    public $_meta;
     use ExtraFieldsTrait;
 
-    public function __construct(
-        public ?Meta $_meta = null,
-    ) {}
+    public function __construct(?Meta $_meta = null)
+    {
+        $this->_meta = $_meta;
+    }
 
     public function validate(): void {
         if ($this->_meta !== null) {
@@ -46,7 +51,10 @@ class Result implements McpModel {
         // Additional validation can be done in subclasses or specialized results
     }
 
-    public function jsonSerialize(): mixed {
+    /**
+     * @return mixed
+     */
+    public function jsonSerialize() {
         $data = [];
         
         // Only include _meta if it's not null

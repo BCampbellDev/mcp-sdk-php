@@ -33,13 +33,32 @@ namespace Mcp\Types;
  * { code: number; message: string; data?: unknown }
  */
 class JsonRpcErrorObject implements McpModel {
+    /**
+     * @readonly
+     * @var int
+     */
+    public $code;
+    /**
+     * @readonly
+     * @var string
+     */
+    public $message;
+    /**
+     * @readonly
+     * @var mixed
+     */
+    public $data = null;
     use ExtraFieldsTrait;
 
-    public function __construct(
-        public readonly int $code,
-        public readonly string $message,
-        public readonly mixed $data = null,
-    ) {}
+    /**
+     * @param mixed $data
+     */
+    public function __construct(int $code, string $message, $data = null)
+    {
+        $this->code = $code;
+        $this->message = $message;
+        $this->data = $data;
+    }
 
     public function validate(): void {
         // code must be integer, message must be string and non-empty
@@ -48,7 +67,10 @@ class JsonRpcErrorObject implements McpModel {
         }
     }
 
-    public function jsonSerialize(): mixed {
+    /**
+     * @return mixed
+     */
+    public function jsonSerialize() {
         $data = [
             'code' => $this->code,
             'message' => $this->message,

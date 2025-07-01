@@ -33,12 +33,23 @@ namespace Mcp\Types;
  * A reference to a resource or resource template definition
  */
 class ResourceReference implements McpModel {
+    /**
+     * @readonly
+     * @var string
+     */
+    public $uri;
+    /**
+     * @readonly
+     * @var string
+     */
+    public $type = 'ref/resource';
     use ExtraFieldsTrait;
 
-    public function __construct(
-        public readonly string $uri,
-        public readonly string $type = 'ref/resource',
-    ) {}
+    public function __construct(string $uri, string $type = 'ref/resource')
+    {
+        $this->uri = $uri;
+        $this->type = $type;
+    }
 
     public static function fromArray(array $data): self {
         $uri = $data['uri'] ?? '';
@@ -64,7 +75,10 @@ class ResourceReference implements McpModel {
         }
     }
 
-    public function jsonSerialize(): mixed {
+    /**
+     * @return mixed
+     */
+    public function jsonSerialize() {
         $data = get_object_vars($this);
         return array_merge($data, $this->extraFields);
     }

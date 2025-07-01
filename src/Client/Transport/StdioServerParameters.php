@@ -34,11 +34,29 @@ use InvalidArgumentException;
  * Parameters for configuring a stdio server connection
  */
 class StdioServerParameters {
+    /**
+     * @readonly
+     * @var string
+     */
+    private $command;
+    /**
+     * @readonly
+     * @var mixed[]
+     */
+    private $args = [];
+    /**
+     * @readonly
+     * @var mixed[]|null
+     */
+    private $env;
     public function __construct(
-        private readonly string $command,
-        private readonly array $args = [],
-        private readonly ?array $env = null,
+        string $command,
+        array $args = [],
+        ?array $env = null
     ) {
+        $this->command = $command;
+        $this->args = $args;
+        $this->env = $env;
         if (empty($command)) {
             throw new InvalidArgumentException('Command cannot be empty');
         }

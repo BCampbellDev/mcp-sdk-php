@@ -29,11 +29,22 @@ declare(strict_types=1);
 namespace Mcp\Types;
 
 class ProgressToken implements McpModel {
-    public function __construct(
-        private string|int $token,
-    ) {}
+    /**
+     * @var int|string
+     */
+    private $token;
+    /**
+     * @param string|int $token
+     */
+    public function __construct($token)
+    {
+        $this->token = $token;
+    }
 
-    public function getValue(): string|int {
+    /**
+     * @return int|string
+     */
+    public function getValue() {
         return $this->token;
     }
 
@@ -44,7 +55,10 @@ class ProgressToken implements McpModel {
         // Numeric zero is allowed; empty string is not.
     }
 
-    public function jsonSerialize(): mixed {
+    /**
+     * @return mixed
+     */
+    public function jsonSerialize() {
         return $this->token;
     }
 }

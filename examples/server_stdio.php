@@ -51,13 +51,13 @@ $server = new Server('example-server', $logger);
 // Register prompt handlers
 $server->registerHandler('prompts/list', function($params) {
     $prompt = new Prompt(
-        name: 'example-prompt',
-        description: 'An example prompt template',
-        arguments: [
+        'example-prompt',
+        'An example prompt template',
+        [
             new PromptArgument(
-                name: 'arg1',
-                description: 'Example argument',
-                required: true
+                'arg1',
+                'Example argument',
+                true
             )
         ]
     );
@@ -77,27 +77,27 @@ $server->registerHandler('prompts/get', function(GetPromptRequestParams $params)
     $argValue = $arguments ? $arguments->arg1 : 'none';
 
     $prompt = new Prompt(
-        name: 'example-prompt',
-        description: 'An example prompt template',
-        arguments: [
+        'example-prompt',
+        'An example prompt template',
+        [
             new PromptArgument(
-                name: 'arg1',
-                description: 'Example argument',
-                required: true
+                'arg1',
+                'Example argument',
+                true
             )
         ]
     );
 
     return new GetPromptResult(
-        messages: [
+        [
             new PromptMessage(
-                role: Role::USER,
-                content: new TextContent(
-                    text: "Example prompt text with argument: $argValue"
+                Role::USER,
+                new TextContent(
+                    "Example prompt text with argument: $argValue"
                 )
             )
         ],
-        description: 'Example prompt'
+        'Example prompt'
     );
 });
 

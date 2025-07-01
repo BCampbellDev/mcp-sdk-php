@@ -47,21 +47,21 @@ class MessageQueue
      *
      * @var int
      */
-    private int $maxQueueSize;
+    private $maxQueueSize;
     
     /**
      * Queue of incoming messages.
      *
      * @var JsonRpcMessage[]
      */
-    private array $incomingQueue = [];
+    private $incomingQueue = [];
     
     /**
      * Queues of outgoing messages, indexed by session ID.
      *
      * @var array<string, JsonRpcMessage[]>
      */
-    private array $outgoingQueues = [];
+    private $outgoingQueues = [];
     
     /**
      * Message IDs mapped to their respective session IDs.
@@ -69,7 +69,7 @@ class MessageQueue
      *
      * @var array<string|int, string>
      */
-    private array $messageIdToSession = [];
+    private $messageIdToSession = [];
     
     /**
      * Constructor.

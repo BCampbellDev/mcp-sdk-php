@@ -33,7 +33,7 @@ namespace Mcp\Types;
  */
 class ReadResourceRequest extends Request {
     public function __construct(
-        string $uri,
+        string $uri
     ) {
         parent::__construct('resources/read', new ReadResourceRequestParams($uri));
     }

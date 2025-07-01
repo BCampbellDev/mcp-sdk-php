@@ -46,7 +46,10 @@ class ToolArguments implements McpModel {
         // no required fields
     }
 
-    public function jsonSerialize(): mixed {
+    /**
+     * @return mixed
+     */
+    public function jsonSerialize() {
         return empty($this->extraFields) ? new \stdClass() : $this->extraFields;
     }
 }

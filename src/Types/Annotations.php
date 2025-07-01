@@ -33,15 +33,24 @@ namespace Mcp\Types;
  * Represents the `annotations` object from Annotated interfaces.
  */
 class Annotations implements McpModel {
+    /**
+     * @var Role[]|null
+     */
+    public $audience;
+    /**
+     * @var float|null
+     */
+    public $priority;
     use ExtraFieldsTrait;
 
     /**
      * @param Role[]|null $audience
      */
-    public function __construct(
-        public ?array $audience = null,
-        public ?float $priority = null,
-    ) {}
+    public function __construct(?array $audience = null, ?float $priority = null)
+    {
+        $this->audience = $audience;
+        $this->priority = $priority;
+    }
 
     public static function fromArray(array $data): self {
         // Extract known fields
@@ -64,8 +73,8 @@ class Annotations implements McpModel {
         }
 
         $obj = new self(
-            audience: $audience,
-            priority: $priority !== null ? (float)$priority : null
+            $audience,
+            $priority !== null ? (float)$priority : null
         );
 
         // Any leftover fields go into extraFields
@@ -92,10 +101,15 @@ class Annotations implements McpModel {
         }
     }
 
-    public function jsonSerialize(): mixed {
+    /**
+     * @return mixed
+     */
+    public function jsonSerialize() {
         $data = [];
         if ($this->audience !== null) {
-            $data['audience'] = array_map(fn($r) => $r->value, $this->audience);
+            $data['audience'] = array_map(function ($r) {
+                return $r->value;
+            }, $this->audience);
         }
         if ($this->priority !== null) {
             $data['priority'] = $this->priority;

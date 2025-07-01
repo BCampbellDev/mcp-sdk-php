@@ -73,25 +73,25 @@ use InvalidArgumentException;
  */
 class ClientSession extends BaseSession {
     /** @var InitializeResult|null */
-    private ?InitializeResult $initResult = null;
+    private $initResult;
 
     /** @var bool */
-    private bool $initialized = false;
+    private $initialized = false;
 
     /** @var LoggerInterface */
-    private LoggerInterface $logger;
+    private $logger;
 
     /** @var MemoryStream|null */
-    private ?MemoryStream $readStream = null;
+    private $readStream;
 
     /** @var MemoryStream|null */
-    private ?MemoryStream $writeStream = null;
+    private $writeStream;
 
     /** @var float|null */
-    private ?float $readTimeout = null;
+    private $readTimeout;
 
     /** @var string|null */
-    private ?string $negotiatedProtocolVersion = null;
+    private $negotiatedProtocolVersion;
 
     /**
      * ClientSession constructor.
@@ -110,8 +110,8 @@ class ClientSession extends BaseSession {
         ?LoggerInterface $logger = null
     ) {
         parent::__construct(
-            receiveRequestType: ServerRequest::class,
-            receiveNotificationType: ServerNotification::class
+            ServerRequest::class,
+            ServerNotification::class
         );
 
         $this->readStream = $readStream;
@@ -133,13 +133,13 @@ class ClientSession extends BaseSession {
         // Create and send InitializeRequest
         $initRequest = new InitializeRequest(
             new InitializeRequestParams(
-                protocolVersion: Version::LATEST_PROTOCOL_VERSION,
-                capabilities: new ClientCapabilities(
+                Version::LATEST_PROTOCOL_VERSION,
+                new ClientCapabilities(
                     //roots: new ClientRootsCapability(listChanged: true)
                 ),
-                clientInfo: new Implementation(
-                    name: 'mcp-client',
-                    version: '1.0.0'
+                new Implementation(
+                    'mcp-client',
+                    '1.0.0'
                 )
             )
         );
@@ -270,10 +270,10 @@ class ClientSession extends BaseSession {
         }
         
         $notificationParams = new \Mcp\Types\ProgressNotificationParams(
-            progressToken: $progressToken,
-            progress: $progress,
-            total: $total,
-            message: $this->supportsFeature('progress_message') ? $message : null
+            $progressToken,
+            $progress,
+            $total,
+            $this->supportsFeature('progress_message') ? $message : null
         );
         
         $notification = new \Mcp\Types\ProgressNotification($notificationParams);
@@ -437,7 +437,7 @@ class ClientSession extends BaseSession {
      * @return CompleteResult The result of the completion.
      */
     public function complete(
-        ResourceReference|PromptReference $ref,
+        $ref,
         array $argument
     ): CompleteResult {
         $this->ensureInitialized();
@@ -491,7 +491,7 @@ class ClientSession extends BaseSession {
      *
      * @return JsonRpcMessage|\Exception|null The received message, an exception, or null if no message is available.
      */
-    public function receiveMessage(): JsonRpcMessage|\Exception|null {
+    public function receiveMessage() {
         $msg = $this->readStream->receive();
         return $msg; // The transport already returns JsonRpcMessage or Exception or null
     }

@@ -38,14 +38,20 @@ namespace Mcp\Types;
  * }
  */
 class JSONRPCNotification extends Notification {
+    /**
+     * @readonly
+     * @var string
+     */
+    public $jsonrpc;
     use ExtraFieldsTrait;
 
     public function __construct(
-        public readonly string $jsonrpc,
+        string $jsonrpc,
         ?NotificationParams $params = null,
-        string $method = '',
+        string $method = ''
     ) {
-        parent::__construct(method: $method, params: $params);
+        $this->jsonrpc = $jsonrpc;
+        parent::__construct($method, $params);
     }
 
     public function validate(): void {
@@ -60,7 +66,10 @@ class JSONRPCNotification extends Notification {
         }
     }
 
-    public function jsonSerialize(): mixed {
+    /**
+     * @return mixed
+     */
+    public function jsonSerialize() {
         $data = parent::jsonSerialize();
         $data['jsonrpc'] = $this->jsonrpc;
         return $data;

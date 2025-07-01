@@ -33,18 +33,60 @@ namespace Mcp\Types;
  */
 class CreateMessageRequest extends Request {
     /**
+     * @var SamplingMessage[]
+     * @readonly
+     */
+    public $messages;
+    /**
+     * @readonly
+     * @var int
+     */
+    public $maxTokens;
+    /**
+     * @var mixed[]|null
+     */
+    public $stopSequences;
+    /**
+     * @var string|null
+     */
+    public $systemPrompt;
+    /**
+     * @var float|null
+     */
+    public $temperature;
+    /**
+     * @var \Mcp\Types\Meta|null
+     */
+    public $metadata;
+    /**
+     * @var \Mcp\Types\ModelPreferences|null
+     */
+    public $modelPreferences;
+    /**
+     * @var string|null
+     */
+    public $includeContext;
+    /**
      * @param SamplingMessage[] $messages
      */
     public function __construct(
-        public readonly array $messages,
-        public readonly int $maxTokens,
-        public ?array $stopSequences = null, // string[]
-        public ?string $systemPrompt = null,
-        public ?float $temperature = null,
-        public ?Meta $metadata = null,
-        public ?ModelPreferences $modelPreferences = null,
-        public ?string $includeContext = null,
+        array $messages,
+        int $maxTokens,
+        ?array $stopSequences = null, ?string $systemPrompt = null,
+        ?float $temperature = null,
+        ?Meta $metadata = null,
+        ?ModelPreferences $modelPreferences = null,
+        ?string $includeContext = null
     ) {
+        $this->messages = $messages;
+        $this->maxTokens = $maxTokens;
+        $this->stopSequences = $stopSequences;
+        // string[]
+        $this->systemPrompt = $systemPrompt;
+        $this->temperature = $temperature;
+        $this->metadata = $metadata;
+        $this->modelPreferences = $modelPreferences;
+        $this->includeContext = $includeContext;
         parent::__construct('sampling/createMessage');
     }
 

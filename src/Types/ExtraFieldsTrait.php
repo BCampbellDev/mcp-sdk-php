@@ -33,14 +33,23 @@ namespace Mcp\Types;
  */
 trait ExtraFieldsTrait
 {
-    protected array $extraFields = [];
+    /**
+     * @var mixed[]
+     */
+    protected $extraFields = [];
 
-    public function __set(string $name, mixed $value): void
+    /**
+     * @param mixed $value
+     */
+    public function __set(string $name, $value): void
     {
         $this->extraFields[$name] = $value;
     }
 
-    public function __get(string $name): mixed
+    /**
+     * @return mixed
+     */
+    public function __get(string $name)
     {
         return $this->extraFields[$name] ?? null;
     }

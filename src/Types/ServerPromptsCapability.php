@@ -38,11 +38,17 @@ namespace Mcp\Types;
  * }
  */
 class ServerPromptsCapability implements McpModel {
+    /**
+     * @readonly
+     * @var bool|null
+     */
+    public $listChanged;
     use ExtraFieldsTrait;
 
-    public function __construct(
-        public readonly ?bool $listChanged = null,
-    ) {}
+    public function __construct(?bool $listChanged = null)
+    {
+        $this->listChanged = $listChanged;
+    }
 
     public static function fromArray(array $data): self {
         $listChanged = $data['listChanged'] ?? null;
@@ -62,7 +68,10 @@ class ServerPromptsCapability implements McpModel {
         // No required fields.
     }
 
-    public function jsonSerialize(): mixed {
+    /**
+     * @return mixed
+     */
+    public function jsonSerialize() {
         $data = [];
         if ($this->listChanged !== null) {
             $data['listChanged'] = $this->listChanged;

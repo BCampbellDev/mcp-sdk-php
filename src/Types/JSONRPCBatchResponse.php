@@ -32,7 +32,7 @@ class JSONRPCBatchResponse implements McpModel, \JsonSerializable {
     use ExtraFieldsTrait;
 
     /** @var array<JSONRPCResponse|JSONRPCError> */
-    public array $messages;
+    public $messages;
     
     public function __construct(array $messages) {
         $this->messages = $messages;
@@ -45,6 +45,8 @@ class JSONRPCBatchResponse implements McpModel, \JsonSerializable {
     }
 
     public function jsonSerialize(): array {
-        return array_map(fn($msg) => $msg->jsonSerialize(), $this->messages);
+        return array_map(function ($msg) {
+            return $msg->jsonSerialize();
+        }, $this->messages);
     }
 }

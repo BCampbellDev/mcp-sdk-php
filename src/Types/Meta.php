@@ -39,7 +39,10 @@ class Meta implements McpModel {
         // No required fields, just arbitrary data allowed
     }
 
-    public function jsonSerialize(): mixed {
+    /**
+     * @return mixed
+     */
+    public function jsonSerialize() {
         // Return only extra fields, since there are no defined properties
         return empty($this->extraFields) ? new \stdClass() : $this->extraFields;
     }

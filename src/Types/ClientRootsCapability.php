@@ -37,17 +37,26 @@ namespace Mcp\Types;
  * }
  */
 class ClientRootsCapability implements McpModel {
+    /**
+     * @readonly
+     * @var bool|null
+     */
+    public $listChanged;
     use ExtraFieldsTrait;
 
-    public function __construct(
-        public readonly ?bool $listChanged = null
-    ) {}
+    public function __construct(?bool $listChanged = null)
+    {
+        $this->listChanged = $listChanged;
+    }
 
     public function validate(): void {
         // No required fields. listChanged is optional.
     }
 
-    public function jsonSerialize(): mixed {
+    /**
+     * @return mixed
+     */
+    public function jsonSerialize() {
         $data = [];
         if ($this->listChanged !== null) {
             $data['listChanged'] = $this->listChanged;

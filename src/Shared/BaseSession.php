@@ -52,23 +52,40 @@ use RuntimeException;
  * Subclasses should implement the abstract methods to handle I/O and message processing.
  */
 abstract class BaseSession {
-    protected bool $isInitialized = false;
+    /**
+     * @var string
+     * @readonly
+     */
+    private $receiveRequestType;
+    /**
+     * @var string
+     * @readonly
+     */
+    private $receiveNotificationType;
+    /**
+     * @var bool
+     */
+    protected $isInitialized = false;
     /** @var array<int, callable(JsonRpcMessage):void> */
-    private array $responseHandlers = [];
+    private $responseHandlers = [];
     /** @var callable[] */
-    private array $requestHandlers = [];
+    private $requestHandlers = [];
     /** @var callable[] */
-    private array $notificationHandlers = [];
-    private int $requestId = 0;
+    private $notificationHandlers = [];
+    /**
+     * @var int
+     */
+    private $requestId = 0;
 
     /**
      * @param string $receiveRequestType       A fully-qualified class name of a type implementing McpModel for incoming requests.
      * @param string $receiveNotificationType  A fully-qualified class name of a type implementing McpModel for incoming notifications.
      */
-    public function __construct(
-        private readonly string $receiveRequestType,
-        private readonly string $receiveNotificationType,
-    ) {}
+    public function __construct(string $receiveRequestType, string $receiveNotificationType)
+    {
+        $this->receiveRequestType = $receiveRequestType;
+        $this->receiveNotificationType = $receiveNotificationType;
+    }
 
     /**
      * Initializes the session and starts message processing.
@@ -115,10 +132,10 @@ abstract class BaseSession {
         // Convert the typed request into a JSON-RPC request message
         // Assuming $request has public properties: method, params
         $jsonRpcRequest = new JsonRpcMessage(new JSONRPCRequest(
-            jsonrpc: '2.0',
-            id: $requestId,
-            method: $request->method,
-            params: $request->params ?? null
+            '2.0',
+            $requestId,
+            $request->params ?? null,
+            $request->method
         ));
 
         // Store a handler that will be called when a response with this requestId is received
@@ -130,9 +147,9 @@ abstract class BaseSession {
                 // It's an error response
                 // Convert JsonRpcErrorObject into ErrorData
                 $errorData = new \Mcp\Shared\ErrorData(
-                    code: $innerMessage->error->code,
-                    message: $innerMessage->error->message,
-                    data: $innerMessage->error->data
+                    $innerMessage->error->code,
+                    $innerMessage->error->message,
+                    $innerMessage->error->data
                 );
                 throw new McpError($errorData);
             } elseif ($innerMessage instanceof JSONRPCResponse) {
@@ -161,9 +178,9 @@ abstract class BaseSession {
     public function sendNotification(McpModel $notification): void {
         // Convert the typed notification into a JSON-RPC notification message
         $jsonRpcNotification = new JSONRPCNotification(
-            jsonrpc: '2.0',
-            method: $notification->method,
-            params: $notification->params ?? null
+            '2.0',
+            $notification->params ?? null,
+            $notification->method
         );
 
         $jsonRpcMessage = new JsonRpcMessage($jsonRpcNotification);
@@ -174,15 +191,15 @@ abstract class BaseSession {
     /**
      * Sends a response to a previously received request.
      * @param RequestId $requestId The request ID to respond to.
-     * @param McpModel|ErrorData $response Either a typed result model or an ErrorData for an error response.
+     * @param mixed $response Either a typed result model or an ErrorData for an error response.
      */
-    public function sendResponse(RequestId $requestId, mixed $response): void {
+    public function sendResponse(RequestId $requestId, $response): void {
         if ($response instanceof ErrorData) {
             // Error response
             $jsonRpcError = new JSONRPCError(
-                jsonrpc: '2.0',
-                id: $requestId,
-                error: new JsonRpcErrorObject(
+                '2.0',
+                $requestId,
+                new JsonRpcErrorObject(
                     code: $response->code,
                     message: $response->message,
                     data: $response->data ?? null
@@ -193,9 +210,9 @@ abstract class BaseSession {
             // Success result
             // Assuming $response implements jsonSerialize()
             $jsonRpcResponse = new JSONRPCResponse(
-                jsonrpc: '2.0',
-                id: $requestId,
-                result: $response
+                '2.0',
+                $requestId,
+                $response
             );
             $message = new JsonRpcMessage($jsonRpcResponse);
         }
@@ -211,16 +228,12 @@ abstract class BaseSession {
         float $progress,
         ?float $total = null
     ): void {
-        $progressNotification = new ProgressNotification(
-            progressToken: $progressToken,
-            progress: $progress,
-            total: $total
-        );
+        $progressNotification = new ProgressNotification();
 
         $jsonRpcNotification = new JSONRPCNotification(
-            jsonrpc: '2.0',
-            method: $progressNotification->method,
-            params: $progressNotification->params
+            '2.0',
+            $progressNotification->params,
+            $progressNotification->method
         );
 
         $jsonRpcMessage = new JsonRpcMessage($jsonRpcNotification);
@@ -284,10 +297,10 @@ abstract class BaseSession {
 
             // Now pass the entire param array into RequestResponder
             $responder = new RequestResponder(
-                requestId: $innerMessage->id,
-                params: $paramsArray,
-                request: $request,
-                session: $this
+                $innerMessage->id,
+                $paramsArray,
+                $request,
+                $this
             );
 
             // Call onRequest handlers

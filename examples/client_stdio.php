@@ -40,9 +40,7 @@ $logger->pushHandler($handler);
 
 // Create server parameters for stdio connection
 $serverParams = new StdioServerParameters(
-    command: 'php',  // Executable
-    args: ['server_stdio.php'],  // File path to the server
-    env: null  // Optional environment variables
+    'php',  ['server_stdio.php'],  null  // Optional environment variables
 );
 
 echo("Creating client\n");
@@ -54,9 +52,9 @@ try {
     echo("Starting to connect\n");
     // Connect to the server using stdio transport
     $session = $client->connect(
-        commandOrUrl: $serverParams->getCommand(),
-        args: $serverParams->getArgs(),
-        env: $serverParams->getEnv()
+        $serverParams->getCommand(),
+        $serverParams->getArgs(),
+        $serverParams->getEnv()
     );
 
     echo("Starting to get available prompts\n");

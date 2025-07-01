@@ -57,13 +57,13 @@ $server = new Server('mcp-test-server');
 // Register prompt handlers (keeping existing code)
 $server->registerHandler('prompts/list', function($params) {
     $prompt = new Prompt(
-        name: 'example-prompt',
-        description: 'An example prompt template',
-        arguments: [
+        'example-prompt',
+        'An example prompt template',
+        [
             new PromptArgument(
-                name: 'arg1',
-                description: 'Example argument',
-                required: true
+                'arg1',
+                'Example argument',
+                true
             )
         ]
     );
@@ -79,26 +79,26 @@ $server->registerHandler('prompts/get', function(GetPromptRequestParams $params)
     // Get argument value safely
     $argValue = $arguments ? $arguments->arg1 : 'none';
     $prompt = new Prompt(
-        name: 'example-prompt',
-        description: 'An example prompt template',
-        arguments: [
+        'example-prompt',
+        'An example prompt template',
+        [
             new PromptArgument(
-                name: 'arg1',
-                description: 'Example argument',
-                required: true
+                'arg1',
+                'Example argument',
+                true
             )
         ]
     );
     return new GetPromptResult(
-        messages: [
+        [
             new PromptMessage(
-                role: Role::USER,
-                content: new TextContent(
-                    text: "Example prompt text with argument: $argValue"
+                Role::USER,
+                new TextContent(
+                    "Example prompt text with argument: $argValue"
                 )
             )
         ],
-        description: 'Example prompt'
+        'Example prompt'
     );
 });
 
@@ -118,14 +118,14 @@ $server->registerHandler('tools/list', function($params) {
 
     // Create schema with properties and required fields
     $inputSchema = new ToolInputSchema(
-        properties: $properties,
-        required: ['num1', 'num2']
+        $properties,
+        ['num1', 'num2']
     );
 
     $tool = new Tool(
-        name: 'add-numbers',
-        description: 'Adds two numbers together',
-        inputSchema: $inputSchema
+        'add-numbers',
+        $inputSchema,
+        'Adds two numbers together'
     );
 
     return new ListToolsResult([$tool]);
@@ -145,17 +145,17 @@ $server->registerHandler('tools/call', function($params) {
 
     if ($num1 === false || $num2 === false) {
         return new CallToolResult(
-            content: [new TextContent(
-                text: "Error: Both arguments must be valid numbers"
+            [new TextContent(
+                "Error: Both arguments must be valid numbers"
             )],
-            isError: true
+            true
         );
     }
 
     $sum = $num1 + $num2;
     return new CallToolResult(
-        content: [new TextContent(
-            text: "The sum of {$num1} and {$num2} is {$sum}"
+        [new TextContent(
+            "The sum of {$num1} and {$num2} is {$sum}"
         )]
     );
 });
@@ -163,10 +163,10 @@ $server->registerHandler('tools/call', function($params) {
 // Add resource handlers
 $server->registerHandler('resources/list', function($params) {
     $resource = new Resource(
-        uri: 'example://greeting',
-        name: 'Greeting Text',
-        description: 'A simple greeting message',
-        mimeType: 'text/plain'
+        'Greeting Text',
+        'example://greeting',
+        'A simple greeting message',
+        'text/plain'
     );
     return new ListResourcesResult([$resource]);
 });
@@ -178,10 +178,10 @@ $server->registerHandler('resources/read', function($params) {
     }
 
     return new ReadResourceResult(
-        contents: [new TextResourceContents(
-            uri: $uri,
-            text: "Hello from the example MCP server!",
-            mimeType: 'text/plain'
+        [new TextResourceContents(
+            "Hello from the example MCP server!",
+            $uri,
+            'text/plain'
         )]
     );
 });
@@ -198,16 +198,16 @@ $server->registerHandler('resources/templates/list', function($params) {
 
     // Create schema with properties and required fields
     $inputSchema = new ToolInputSchema(
-        properties: $properties,
-        required: ['name']
+        $properties,
+        ['name']
     );
 
     // Create template instance with variable placeholder and schema
     $template = new ResourceTemplate(
-        name: 'get_greeting',
-        uriTemplate: 'greeting://{name}',
-        description: 'Get a personalized greeting',
-        mimeType: 'text/plain'
+        'get_greeting',
+        'greeting://{name}',
+        'Get a personalized greeting',
+        'text/plain'
     );
     $template->inputSchema = $inputSchema;
 
@@ -215,9 +215,7 @@ $server->registerHandler('resources/templates/list', function($params) {
 });
 
 // Create initialization options and run server
-$notificationOptions = new \Mcp\Server\NotificationOptions(
-    resourcesChanged: true
-);
+$notificationOptions = new \Mcp\Server\NotificationOptions(false, true);
 $initOptions = $server->createInitializationOptions($notificationOptions);
 $runner = new ServerRunner($server, $initOptions);
 

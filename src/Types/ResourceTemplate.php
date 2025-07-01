@@ -30,16 +30,38 @@ declare(strict_types=1);
 namespace Mcp\Types;
 
 class ResourceTemplate implements McpModel {
+    /**
+     * @readonly
+     * @var string
+     */
+    public $name;
+    /**
+     * @readonly
+     * @var string
+     */
+    public $uriTemplate;
+    /**
+     * @var string|null
+     */
+    public $description;
+    /**
+     * @var string|null
+     */
+    public $mimeType;
     use ExtraFieldsTrait;
     use AnnotatedTrait;
 
     public function __construct(
-        public readonly string $name,
-        public readonly string $uriTemplate,
-        public ?string $description = null,
-        public ?string $mimeType = null,
+        string $name,
+        string $uriTemplate,
+        ?string $description = null,
+        ?string $mimeType = null,
         ?Annotations $annotations = null
     ) {
+        $this->name = $name;
+        $this->uriTemplate = $uriTemplate;
+        $this->description = $description;
+        $this->mimeType = $mimeType;
         $this->annotations = $annotations;
     }
 
@@ -77,7 +99,10 @@ class ResourceTemplate implements McpModel {
         $this->validateAnnotations();
     }
 
-    public function jsonSerialize(): mixed {
+    /**
+     * @return mixed
+     */
+    public function jsonSerialize() {
         $data = [
             'name' => $this->name,
             'uriTemplate' => $this->uriTemplate,

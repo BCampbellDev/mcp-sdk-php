@@ -33,12 +33,18 @@ namespace Mcp\Types;
  * { uri: string }
  */
 class ReadResourceRequestParams extends RequestParams {
+    /**
+     * @readonly
+     * @var string
+     */
+    public $uri;
     use ExtraFieldsTrait;
 
     public function __construct(
-        public readonly string $uri,
+        string $uri,
         ?Meta $_meta = null
     ) {
+        $this->uri = $uri;
         parent::__construct($_meta);
     }
 
@@ -50,7 +56,10 @@ class ReadResourceRequestParams extends RequestParams {
         }
     }
 
-    public function jsonSerialize(): mixed {
+    /**
+     * @return mixed
+     */
+    public function jsonSerialize() {
         // Get parent data
         $parentData = parent::jsonSerialize();
         if ($parentData instanceof \stdClass) {

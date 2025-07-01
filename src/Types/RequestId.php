@@ -32,11 +32,19 @@ namespace Mcp\Types;
  * A request ID can be a string or a number.
  */
 class RequestId implements McpModel {
+    /**
+     * @var int|string
+     */
+    public $value;
     use ExtraFieldsTrait;
 
-    public function __construct(
-        public string|int $value
-    ) {}
+    /**
+     * @param string|int $value
+     */
+    public function __construct($value)
+    {
+        $this->value = $value;
+    }
 
     public function validate(): void {
         // No specific validation besides non-empty. 
@@ -46,12 +54,18 @@ class RequestId implements McpModel {
         }
     }
 
-    public function jsonSerialize(): mixed {
+    /**
+     * @return mixed
+     */
+    public function jsonSerialize() {
         // Just serialize the value directly, plus any extra fields.
         return $this->value;
     }
 
-    public function getValue(): string|int {
+    /**
+     * @return int|string
+     */
+    public function getValue() {
         return $this->value;
     }
 }

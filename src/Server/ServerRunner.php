@@ -45,13 +45,28 @@ use RuntimeException;
  * Here, we run a loop reading messages from STDIO, passing them to the Server for handling.
  */
 class ServerRunner {
-    protected LoggerInterface $logger;
+    /**
+     * @readonly
+     * @var \Mcp\Server\Server
+     */
+    private $server;
+    /**
+     * @readonly
+     * @var \Mcp\Server\InitializationOptions
+     */
+    private $initOptions;
+    /**
+     * @var \Psr\Log\LoggerInterface
+     */
+    protected $logger;
 
     public function __construct(
-        private readonly Server $server,
-        private readonly InitializationOptions $initOptions,
+        Server $server,
+        InitializationOptions $initOptions,
         ?LoggerInterface $logger = null
     ) {
+        $this->server = $server;
+        $this->initOptions = $initOptions;
         $this->logger = $logger ?? $this->createDefaultLogger();
     }
 

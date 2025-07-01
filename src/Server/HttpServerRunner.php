@@ -42,18 +42,28 @@ use Psr\Log\NullLogger;
 class HttpServerRunner extends ServerRunner
 {
     /**
+     * @var Server
+     * @readonly
+     */
+    private $server;
+    /**
+     * @var InitializationOptions
+     * @readonly
+     */
+    private $initOptions;
+    /**
      * HTTP transport instance.
      *
      * @var HttpServerTransport
      */
-    private HttpServerTransport $transport;
+    private $transport;
     
     /**
      * Server session instance.
      *
      * @var ServerSession|null
      */
-    private ?ServerSession $serverSession = null;
+    private $serverSession;
     
     /**
      * Constructor.
@@ -65,12 +75,14 @@ class HttpServerRunner extends ServerRunner
      * @param SessionStoreInterface|null $sessionStore Session store
      */
     public function __construct(
-        private readonly Server $server,
-        private readonly InitializationOptions $initOptions,
+        Server $server,
+        InitializationOptions $initOptions,
         array $httpOptions = [],
         ?LoggerInterface $logger = null,
         ?SessionStoreInterface $sessionStore = null
     ) {
+        $this->server = $server;
+        $this->initOptions = $initOptions;
         // Create HTTP transport
         $this->transport = new HttpServerTransport($httpOptions, $sessionStore);
         

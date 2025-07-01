@@ -30,13 +30,27 @@ declare(strict_types=1);
 namespace Mcp\Types;
 
 class PromptArgument implements McpModel {
+    /**
+     * @readonly
+     * @var string
+     */
+    public $name;
+    /**
+     * @var string|null
+     */
+    public $description;
+    /**
+     * @var bool
+     */
+    public $required = false;
     use ExtraFieldsTrait;
 
-    public function __construct(
-        public readonly string $name,
-        public ?string $description = null,
-        public bool $required = false,
-    ) {}
+    public function __construct(string $name, ?string $description = null, bool $required = false)
+    {
+        $this->name = $name;
+        $this->description = $description;
+        $this->required = $required;
+    }
 
     public static function fromArray(array $data): self {
         $name = $data['name'] ?? '';
@@ -45,9 +59,9 @@ class PromptArgument implements McpModel {
         unset($data['name'], $data['description'], $data['required']);
 
         $obj = new self(
-            name: $name,
-            description: $description,
-            required: (bool)$required
+            $name,
+            $description,
+            (bool)$required
         );
 
         foreach ($data as $k => $v) {
@@ -64,7 +78,10 @@ class PromptArgument implements McpModel {
         }
     }
 
-    public function jsonSerialize(): mixed {
+    /**
+     * @return mixed
+     */
+    public function jsonSerialize() {
         $data = [
             'name' => $this->name,
         ];

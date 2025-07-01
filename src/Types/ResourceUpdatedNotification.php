@@ -30,7 +30,7 @@ namespace Mcp\Types;
 
 class ResourceUpdatedNotification extends Notification {
     public function __construct(
-        string $uri,
+        string $uri
     ) {
         parent::__construct('notifications/resources/updated', new ResourceUpdatedNotificationParams($uri));
     }

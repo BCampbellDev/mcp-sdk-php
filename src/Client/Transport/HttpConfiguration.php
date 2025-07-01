@@ -37,6 +37,50 @@
   */
  class HttpConfiguration {
      /**
+      * @var string
+      */
+     private $endpoint;
+     /**
+      * @var array
+      */
+     private $headers = [];
+     /**
+      * @var float
+      */
+     private $connectionTimeout = 30.0;
+     /**
+      * @var float
+      */
+     private $readTimeout = 60.0;
+     /**
+      * @var float
+      */
+     private $sseIdleTimeout = 300.0;
+     /**
+      * @var bool
+      */
+     private $enableSse = true;
+     /**
+      * @var int
+      */
+     private $maxRetries = 3;
+     /**
+      * @var float
+      */
+     private $retryDelay = 0.5;
+     /**
+      * @var bool
+      */
+     private $verifyTls = true;
+     /**
+      * @var string|null
+      */
+     private $caFile;
+     /**
+      * @var array
+      */
+     private $curlOptions = [];
+     /**
       * @param string $endpoint The HTTP endpoint URL for the MCP server
       * @param array $headers Additional HTTP headers to include with all requests
       * @param float $connectionTimeout Timeout for establishing connections (seconds)
@@ -50,18 +94,29 @@
       * @param array $curlOptions Additional cURL options as key-value pairs
       */
      public function __construct(
-         private string $endpoint,
-         private array $headers = [],
-         private float $connectionTimeout = 30.0,
-         private float $readTimeout = 60.0,
-         private float $sseIdleTimeout = 300.0,
-         private bool $enableSse = true,
-         private int $maxRetries = 3,
-         private float $retryDelay = 0.5,
-         private bool $verifyTls = true,
-         private ?string $caFile = null,
-         private array $curlOptions = []
+         string $endpoint,
+         array $headers = [],
+         float $connectionTimeout = 30.0,
+         float $readTimeout = 60.0,
+         float $sseIdleTimeout = 300.0,
+         bool $enableSse = true,
+         int $maxRetries = 3,
+         float $retryDelay = 0.5,
+         bool $verifyTls = true,
+         ?string $caFile = null,
+         array $curlOptions = []
      ) {
+         $this->endpoint = $endpoint;
+         $this->headers = $headers;
+         $this->connectionTimeout = $connectionTimeout;
+         $this->readTimeout = $readTimeout;
+         $this->sseIdleTimeout = $sseIdleTimeout;
+         $this->enableSse = $enableSse;
+         $this->maxRetries = $maxRetries;
+         $this->retryDelay = $retryDelay;
+         $this->verifyTls = $verifyTls;
+         $this->caFile = $caFile;
+         $this->curlOptions = $curlOptions;
          $this->validateEndpoint($endpoint);
          $this->normalizeHeaders();
      }

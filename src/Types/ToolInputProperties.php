@@ -53,7 +53,10 @@ class ToolInputProperties implements McpModel {
         // Arbitrary fields allowed. Not validating contents.
     }
 
-    public function jsonSerialize(): mixed {
+    /**
+     * @return mixed
+     */
+    public function jsonSerialize() {
         return empty($this->extraFields) ? new \stdClass() : $this->extraFields;
     }
 }

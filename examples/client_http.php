@@ -22,11 +22,26 @@ use Psr\Log\LoggerInterface;
  * and lists all available resources, prompts, and tools.
  */
 class McpHttpClient {
-    private Client $client;
-    private ?string $endpoint = null;
-    private array $headers = [];
-    private array $options = [];
-    private ?LoggerInterface $logger = null;
+    /**
+     * @var \Mcp\Client\Client
+     */
+    private $client;
+    /**
+     * @var string|null
+     */
+    private $endpoint;
+    /**
+     * @var mixed[]
+     */
+    private $headers = [];
+    /**
+     * @var mixed[]
+     */
+    private $options = [];
+    /**
+     * @var \Psr\Log\LoggerInterface|null
+     */
+    private $logger;
     
     public function __construct(LoggerInterface $logger = null) {
         $this->client = new Client($logger);
@@ -107,9 +122,9 @@ class McpHttpClient {
             
             // Create a session
             $session = $this->client->connect(
-                commandOrUrl: $this->endpoint,
-                args: $this->headers,
-                env: $this->options
+                $this->endpoint,
+                $this->headers,
+                $this->options
             );
             
             echo "Connection established successfully.\n\n";
@@ -190,8 +205,9 @@ class McpHttpClient {
     
     /**
      * Format a value for display.
+     * @param mixed $value
      */
-    private function formatValue(mixed $value): string {
+    private function formatValue($value): string {
         if (is_bool($value)) {
             return $value ? 'true' : 'false';
         } elseif (is_array($value)) {

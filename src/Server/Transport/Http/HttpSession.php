@@ -39,35 +39,35 @@ class HttpSession
      *
      * @var string
      */
-    protected string $id;
+    protected $id;
     
     /**
      * Session creation timestamp.
      *
      * @var int
      */
-    protected int $createdAt;
+    protected $createdAt;
     
     /**
      * Last activity timestamp.
      *
      * @var int
      */
-    protected int $lastActivity;
+    protected $lastActivity;
     
     /**
      * Session metadata.
      *
      * @var array<string, mixed>
      */
-    protected array $metadata = [];
+    protected $metadata = [];
     
     /**
      * Session state.
      *
      * @var string One of: 'new', 'active', 'expired'
      */
-    protected string $state = 'new';
+    protected $state = 'new';
     
     /**
      * Constructor.

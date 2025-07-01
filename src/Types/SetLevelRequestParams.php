@@ -33,17 +33,26 @@ namespace Mcp\Types;
  * { level: LoggingLevel }
  */
 class SetLevelRequestParams implements McpModel {
+    /**
+     * @readonly
+     * @var \Mcp\Types\LoggingLevel
+     */
+    public $level;
     use ExtraFieldsTrait;
 
-    public function __construct(
-        public readonly LoggingLevel $level
-    ) {}
+    public function __construct(LoggingLevel $level)
+    {
+        $this->level = $level;
+    }
 
     public function validate(): void {
         // level is an enum, always valid
     }
 
-    public function jsonSerialize(): mixed {
+    /**
+     * @return mixed
+     */
+    public function jsonSerialize() {
         return array_merge(['level' => $this->level->value], $this->extraFields);
     }
 }

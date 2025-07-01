@@ -31,12 +31,18 @@ namespace Mcp\Types;
 
 class ListRootsResult extends Result {
     /**
+     * @var Root[]
+     * @readonly
+     */
+    public $roots;
+    /**
      * @param Root[] $roots
      */
     public function __construct(
-        public readonly array $roots,
-        ?Meta $_meta = null,
+        array $roots,
+        ?Meta $_meta = null
     ) {
+        $this->roots = $roots;
         parent::__construct($_meta);
     }
 
@@ -50,7 +56,10 @@ class ListRootsResult extends Result {
         }
     }
 
-    public function jsonSerialize(): mixed {
+    /**
+     * @return mixed
+     */
+    public function jsonSerialize() {
         $data = parent::jsonSerialize();
         $data['roots'] = $this->roots;
         return $data;

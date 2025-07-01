@@ -45,7 +45,10 @@ class PaginatedRequestParams extends RequestParams
         $this->cursor = $cursor;
     }
 
-    public ?string $cursor = null;
+    /**
+     * @var string|null
+     */
+    public $cursor;
 
     public function validate(): void
     {
@@ -53,7 +56,10 @@ class PaginatedRequestParams extends RequestParams
         // No additional required fields
     }
 
-    public function jsonSerialize(): mixed
+    /**
+     * @return mixed
+     */
+    public function jsonSerialize()
     {
         $data = [];
 

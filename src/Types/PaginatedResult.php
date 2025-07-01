@@ -30,10 +30,15 @@ declare(strict_types=1);
 namespace Mcp\Types;
 
 class PaginatedResult extends Result {
+    /**
+     * @var string|null
+     */
+    public $nextCursor;
     public function __construct(
-        public ?string $nextCursor = null,
-        ?Meta $_meta = null,
+        ?string $nextCursor = null,
+        ?Meta $_meta = null
     ) {
+        $this->nextCursor = $nextCursor;
         parent::__construct($_meta);
     }
 
@@ -42,7 +47,10 @@ class PaginatedResult extends Result {
         // no extra validation needed for nextCursor
     }
 
-    public function jsonSerialize(): mixed {
+    /**
+     * @return mixed
+     */
+    public function jsonSerialize() {
         // Get data from parent (which now handles empty objects correctly)
         $data = parent::jsonSerialize();
         

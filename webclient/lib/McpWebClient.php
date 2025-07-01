@@ -38,10 +38,10 @@ use Mcp\Types\InitializeResult;
 
 class McpWebClient {
     /** @var Client */
-    private Client $client;
+    private $client;
     
     /** @var Logger */
-    private Logger $logger;
+    private $logger;
 
     public function __construct(Logger $logger) {
         $this->client = new Client($logger);
@@ -119,34 +119,48 @@ class McpWebClient {
             );
 
             try {
-                // Execute operation
-                $result = match($operation) {
-                    'list_prompts' => [
-                        'result' => $session->listPrompts(),
-                        'store' => 'prompts'
-                    ],
-                    'get_prompt' => [
-                        'result' => $session->getPrompt($params['name'], $params['arguments'] ?? null)
-                    ],
-                    'list_tools' => [
-                        'result' => $session->listTools(),
-                        'store' => 'tools'
-                    ],
-                    'call_tool' => [
-                        'result' => $session->callTool($params['name'], $params['arguments'] ?? null)
-                    ],
-                    'list_resources' => [
-                        'result' => $session->listResources(),
-                        'store' => 'resources'
-                    ],
-                    'read_resource' => [
-                        'result' => $session->readResource($params['uri'])
-                    ],
-                    'ping' => [
-                        'result' => $session->sendPing()
-                    ],
-                    default => throw new InvalidArgumentException("Unknown operation: $operation")
-                };
+                switch ($operation) {
+                    case 'list_prompts':
+                        $result = [
+                            'result' => $session->listPrompts(),
+                            'store' => 'prompts'
+                        ];
+                        break;
+                    case 'get_prompt':
+                        $result = [
+                            'result' => $session->getPrompt($params['name'], $params['arguments'] ?? null)
+                        ];
+                        break;
+                    case 'list_tools':
+                        $result = [
+                            'result' => $session->listTools(),
+                            'store' => 'tools'
+                        ];
+                        break;
+                    case 'call_tool':
+                        $result = [
+                            'result' => $session->callTool($params['name'], $params['arguments'] ?? null)
+                        ];
+                        break;
+                    case 'list_resources':
+                        $result = [
+                            'result' => $session->listResources(),
+                            'store' => 'resources'
+                        ];
+                        break;
+                    case 'read_resource':
+                        $result = [
+                            'result' => $session->readResource($params['uri'])
+                        ];
+                        break;
+                    case 'ping':
+                        $result = [
+                            'result' => $session->sendPing()
+                        ];
+                        break;
+                    default:
+                        throw new InvalidArgumentException("Unknown operation: $operation");
+                }
 
                 // Store cacheable results
                 if (isset($result['store'])) {

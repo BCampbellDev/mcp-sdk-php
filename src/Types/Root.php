@@ -30,12 +30,22 @@ declare(strict_types=1);
 namespace Mcp\Types;
 
 class Root implements McpModel {
+    /**
+     * @readonly
+     * @var string
+     */
+    public $uri;
+    /**
+     * @var string|null
+     */
+    public $name;
     use ExtraFieldsTrait;
 
-    public function __construct(
-        public readonly string $uri,
-        public ?string $name = null,
-    ) {}
+    public function __construct(string $uri, ?string $name = null)
+    {
+        $this->uri = $uri;
+        $this->name = $name;
+    }
 
     public static function fromArray(array $data): self {
         $uri = $data['uri'] ?? '';
@@ -56,12 +66,15 @@ class Root implements McpModel {
         if (empty($this->uri)) {
             throw new \InvalidArgumentException('Root URI cannot be empty');
         }
-        if (!str_starts_with($this->uri, 'file://')) {
+        if (strncmp($this->uri, 'file://', strlen('file://')) !== 0) {
             throw new \InvalidArgumentException('Root URI must start with file://');
         }
     }
 
-    public function jsonSerialize(): mixed {
+    /**
+     * @return mixed
+     */
+    public function jsonSerialize() {
         $data = ['uri' => $this->uri];
         if ($this->name !== null) {
             $data['name'] = $this->name;

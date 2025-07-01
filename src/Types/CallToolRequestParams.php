@@ -33,26 +33,41 @@ namespace Mcp\Types;
  * Parameters for CallToolRequest
  */
 class CallToolRequestParams extends RequestParams {
+    /**
+     * @readonly
+     * @var string
+     */
+    public $name;
+    /**
+     * @readonly
+     * @var mixed[]|null
+     */
+    public $arguments;
     use ExtraFieldsTrait;
 
     public function __construct(
-        public readonly string $name,
-        public readonly ?array $arguments = null,
+        string $name,
+        ?array $arguments = null,
         ?Meta $_meta = null
     ) {
+        $this->name = $name;
+        $this->arguments = $arguments;
         parent::__construct($_meta);
     }
 
     public function validate(): void {
         parent::validate();
-        
+
         if (empty($this->name)) {
             throw new \InvalidArgumentException('Tool name cannot be empty in CallToolRequestParams.');
         }
         // `arguments` can be any associative array; add validation if necessary
     }
 
-    public function jsonSerialize(): mixed {
+    /**
+     * @return mixed
+     */
+    public function jsonSerialize() {
         $data = [
             'name' => $this->name,
             // Return an empty object if arguments are null or empty

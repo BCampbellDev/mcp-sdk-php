@@ -31,13 +31,19 @@ namespace Mcp\Types;
 
 class ListResourcesResult extends PaginatedResult {
     /**
+     * @var Resource[]
+     * @readonly
+     */
+    public $resources;
+    /**
      * @param Resource[] $resources
      */
     public function __construct(
-        public readonly array $resources,
+        array $resources,
         ?string $nextCursor = null,
-        ?Meta $_meta = null,
+        ?Meta $_meta = null
     ) {
+        $this->resources = $resources;
         parent::__construct($nextCursor, $_meta);
     }
 
@@ -76,7 +82,10 @@ class ListResourcesResult extends PaginatedResult {
         }
     }
 
-    public function jsonSerialize(): mixed {
+    /**
+     * @return mixed
+     */
+    public function jsonSerialize() {
         $data = parent::jsonSerialize();
         $data['resources'] = $this->resources;
         return $data;

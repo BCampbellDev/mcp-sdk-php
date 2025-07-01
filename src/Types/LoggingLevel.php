@@ -28,16 +28,14 @@ declare(strict_types=1);
 
 namespace Mcp\Types;
 
-/**
- * LoggingLevel enum representing possible logging levels
- */
-enum LoggingLevel: string {
-    case EMERGENCY = 'emergency';
-    case ALERT = 'alert';
-    case CRITICAL = 'critical';
-    case ERROR = 'error';
-    case WARNING = 'warning';
-    case NOTICE = 'notice';
-    case INFO = 'info';
-    case DEBUG = 'debug';
+class LoggingLevel
+{
+    public const EMERGENCY = 'emergency';
+    public const ALERT = 'alert';
+    public const CRITICAL = 'critical';
+    public const ERROR = 'error';
+    public const WARNING = 'warning';
+    public const NOTICE = 'notice';
+    public const INFO = 'info';
+    public const DEBUG = 'debug';
 }

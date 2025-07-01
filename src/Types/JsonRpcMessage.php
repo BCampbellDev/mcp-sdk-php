@@ -40,20 +40,30 @@ namespace Mcp\Types;
  * This class acts as a RootModel for that union.
  */
 class JsonRpcMessage implements McpModel {
+    /**
+     * @readonly
+     * @var \Mcp\Types\JSONRPCRequest|\Mcp\Types\JSONRPCNotification|\Mcp\Types\JSONRPCResponse|\Mcp\Types\JSONRPCError|\Mcp\Types\JSONRPCBatchRequest|\Mcp\Types\JSONRPCBatchResponse
+     */
+    public $message;
     use ExtraFieldsTrait;
 
     /**
      * We store one of the four possible variants.
+     * @param \Mcp\Types\JSONRPCRequest|\Mcp\Types\JSONRPCNotification|\Mcp\Types\JSONRPCResponse|\Mcp\Types\JSONRPCError|\Mcp\Types\JSONRPCBatchRequest|\Mcp\Types\JSONRPCBatchResponse $message
      */
-    public function __construct(
-        public readonly JSONRPCRequest|JSONRPCNotification|JSONRPCResponse|JSONRPCError|JSONRPCBatchRequest|JSONRPCBatchResponse $message
-    ) {}
+    public function __construct($message)
+    {
+        $this->message = $message;
+    }
 
     public function validate(): void {
         $this->message->validate();
     }
 
-    public function jsonSerialize(): mixed {
+    /**
+     * @return mixed
+     */
+    public function jsonSerialize() {
         // Just serialize the underlying message variant.
         $data = $this->message->jsonSerialize();
 

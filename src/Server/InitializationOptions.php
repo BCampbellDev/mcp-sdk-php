@@ -37,13 +37,29 @@ use InvalidArgumentException;
  * Options used to initialize an MCP server
  */
 class InitializationOptions implements McpModel {
+    /**
+     * @readonly
+     * @var string
+     */
+    public $serverName;
+    /**
+     * @readonly
+     * @var string
+     */
+    public $serverVersion;
+    /**
+     * @readonly
+     * @var \Mcp\Types\ServerCapabilities
+     */
+    public $capabilities;
     use ExtraFieldsTrait;
 
-    public function __construct(
-        public readonly string $serverName,
-        public readonly string $serverVersion,
-        public readonly ServerCapabilities $capabilities
-    ) {}
+    public function __construct(string $serverName, string $serverVersion, ServerCapabilities $capabilities)
+    {
+        $this->serverName = $serverName;
+        $this->serverVersion = $serverVersion;
+        $this->capabilities = $capabilities;
+    }
 
     public function validate(): void {
         if (empty($this->serverName)) {
@@ -55,7 +71,10 @@ class InitializationOptions implements McpModel {
         $this->capabilities->validate();
     }
 
-    public function jsonSerialize(): mixed {
+    /**
+     * @return mixed
+     */
+    public function jsonSerialize() {
         $data = [
             'server_name' => $this->serverName,
             'server_version' => $this->serverVersion,

@@ -51,7 +51,10 @@ namespace Mcp\Types;
 class ClientRequest implements McpModel {
     use ExtraFieldsTrait;
 
-    private Request $request;
+    /**
+     * @var \Mcp\Types\Request
+     */
+    private $request;
 
     /**
      * Construct a ClientRequest by passing a fully-instantiated Request subclass.
@@ -87,22 +90,36 @@ class ClientRequest implements McpModel {
     public static function fromMethodAndParams(string $method, ?array $params): self {
         $params = $params ?? [];
 
-        return match ($method) {
-            'initialize' => self::createInitializeRequest($params),
-            'ping' => new self(new PingRequest()),
-            'completion/complete' => self::createCompleteRequest($params),
-            'logging/setLevel' => self::createSetLevelRequest($params),
-            'prompts/get' => self::createGetPromptRequest($params),
-            'prompts/list' => self::createListPromptsRequest($params),
-            'resources/list' => self::createListResourcesRequest($params),
-            'resources/read' => self::createReadResourceRequest($params),
-            'resources/subscribe' => self::createSubscribeRequest($params),
-            'resources/unsubscribe' => self::createUnsubscribeRequest($params),
-            'resources/templates/list' => self::createListTemplatesRequest($params),
-            'tools/call' => self::createCallToolRequest($params),
-            'tools/list' => self::createListToolsRequest($params),
-            default => throw new \InvalidArgumentException("Unknown client request method: $method")
-        };
+        switch ($method) {
+            case 'initialize':
+                return self::createInitializeRequest($params);
+            case 'ping':
+                return new self(new PingRequest());
+            case 'completion/complete':
+                return self::createCompleteRequest($params);
+            case 'logging/setLevel':
+                return self::createSetLevelRequest($params);
+            case 'prompts/get':
+                return self::createGetPromptRequest($params);
+            case 'prompts/list':
+                return self::createListPromptsRequest($params);
+            case 'resources/list':
+                return self::createListResourcesRequest($params);
+            case 'resources/read':
+                return self::createReadResourceRequest($params);
+            case 'resources/subscribe':
+                return self::createSubscribeRequest($params);
+            case 'resources/unsubscribe':
+                return self::createUnsubscribeRequest($params);
+            case 'resources/templates/list':
+                return self::createListTemplatesRequest($params);
+            case 'tools/call':
+                return self::createCallToolRequest($params);
+            case 'tools/list':
+                return self::createListToolsRequest($params);
+            default:
+                throw new \InvalidArgumentException("Unknown client request method: $method");
+        }
     }
 
     private static function createInitializeRequest(array $params): self {
@@ -141,9 +158,9 @@ class ClientRequest implements McpModel {
         }
 
         $capabilities = new ClientCapabilities(
-            roots: $roots,
-            sampling: $sampling,
-            experimental: $experimental
+            $roots,
+            $sampling,
+            $experimental
         );
 
         // Implementation
@@ -151,8 +168,8 @@ class ClientRequest implements McpModel {
             throw new \InvalidArgumentException('clientInfo must have name and version.');
         }
         $clientInfo = new Implementation(
-            name: $params['clientInfo']['name'],
-            version: $params['clientInfo']['version']
+            $params['clientInfo']['name'],
+            $params['clientInfo']['version']
         );
 
         if (empty($params['protocolVersion'])) {
@@ -160,10 +177,10 @@ class ClientRequest implements McpModel {
         }
 
         $initializeParams = new InitializeRequestParams(
-            protocolVersion: $params['protocolVersion'],
-            capabilities: $capabilities,
-            clientInfo: $clientInfo,
-            _meta: $params['_meta'] ?? null
+            $params['protocolVersion'],
+            $capabilities,
+            $clientInfo,
+            $params['_meta'] ?? null
         );
 
         return new self(new InitializeRequest($initializeParams));
@@ -182,11 +199,16 @@ class ClientRequest implements McpModel {
             throw new \InvalidArgumentException('CompleteRequest ref must have a "type"');
         }
 
-        $ref = match ($refData['type']) {
-            'ref/prompt' => new PromptReference($refData['name'] ?? ''),
-            'ref/resource' => new ResourceReference($refData['uri'] ?? ''),
-            default => throw new \InvalidArgumentException("Unknown ref type: {$refData['type']}")
-        };
+        switch ($refData['type']) {
+            case 'ref/prompt':
+                $ref = new PromptReference($refData['name'] ?? '');
+                break;
+            case 'ref/resource':
+                $ref = new ResourceReference($refData['uri'] ?? '');
+                break;
+            default:
+                throw new \InvalidArgumentException("Unknown ref type: {$refData['type']}");
+        }
 
         // Construct the new CompleteRequestParams
         $reqParams = new CompleteRequestParams($argument, $ref);
@@ -214,8 +236,8 @@ class ClientRequest implements McpModel {
         }
 
         $getParams = new GetPromptRequestParams(
-            name: $params['name'],
-            arguments: $arguments
+            $params['name'],
+            $arguments
         );
 
         return new self(new GetPromptRequest($getParams));
@@ -235,21 +257,21 @@ class ClientRequest implements McpModel {
         if (empty($params['uri'])) {
             throw new \InvalidArgumentException('ReadResourceRequest requires "uri"');
         }
-        return new self(new ReadResourceRequest(uri: $params['uri']));
+        return new self(new ReadResourceRequest($params['uri']));
     }
 
     private static function createSubscribeRequest(array $params): self {
         if (empty($params['uri'])) {
             throw new \InvalidArgumentException('SubscribeRequest requires "uri"');
         }
-        return new self(new SubscribeRequest(uri: $params['uri']));
+        return new self(new SubscribeRequest($params['uri']));
     }
 
     private static function createUnsubscribeRequest(array $params): self {
         if (empty($params['uri'])) {
             throw new \InvalidArgumentException('UnsubscribeRequest requires "uri"');
         }
-        return new self(new UnsubscribeRequest(uri: $params['uri']));
+        return new self(new UnsubscribeRequest($params['uri']));
     }
 
     private static function createCallToolRequest(array $params): self {
@@ -283,7 +305,10 @@ class ClientRequest implements McpModel {
         return $this->request;
     }
 
-    public function jsonSerialize(): mixed {
+    /**
+     * @return mixed
+     */
+    public function jsonSerialize() {
         $data = $this->request->jsonSerialize();
         return array_merge((array)$data, $this->extraFields);
     }

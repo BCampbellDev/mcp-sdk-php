@@ -43,7 +43,10 @@ namespace Mcp\Types;
 class ClientNotification implements McpModel {
     use ExtraFieldsTrait;
 
-    private Notification $notification;
+    /**
+     * @var \Mcp\Types\Notification
+     */
+    private $notification;
 
     public function __construct(Notification $notification) {
         if (!(
@@ -66,13 +69,18 @@ class ClientNotification implements McpModel {
     public static function fromMethodAndParams(string $method, ?array $params): self {
         $params = $params ?? [];
 
-        return match ($method) {
-            'notifications/cancelled' => self::createCancelledNotification($params),
-            'notifications/initialized' => self::createInitializedNotification($params),
-            'notifications/progress' => self::createProgressNotification($params),
-            'notifications/roots/list_changed' => self::createRootsListChangedNotification($params),
-            default => throw new \InvalidArgumentException("Unknown client notification method: $method"),
-        };
+        switch ($method) {
+            case 'notifications/cancelled':
+                return self::createCancelledNotification($params);
+            case 'notifications/initialized':
+                return self::createInitializedNotification($params);
+            case 'notifications/progress':
+                return self::createProgressNotification($params);
+            case 'notifications/roots/list_changed':
+                return self::createRootsListChangedNotification($params);
+            default:
+                throw new \InvalidArgumentException("Unknown client notification method: $method");
+        }
     }
 
     private static function createCancelledNotification(array $params): self {
@@ -143,9 +151,9 @@ class ClientNotification implements McpModel {
         }
 
         $progressParams = new ProgressNotificationParams(
-            progressToken: $progressToken,
-            progress: $progress,
-            total: $total
+            $progressToken,
+            $progress,
+            $total
         );
 
         // Extra fields not in the known set can be added as extra fields
@@ -178,7 +186,10 @@ class ClientNotification implements McpModel {
         return $this->notification;
     }
 
-    public function jsonSerialize(): mixed {
+    /**
+     * @return mixed
+     */
+    public function jsonSerialize() {
         $data = $this->notification->jsonSerialize();
         return array_merge((array)$data, $this->extraFields);
     }

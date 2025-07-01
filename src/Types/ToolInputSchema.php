@@ -38,15 +38,26 @@ namespace Mcp\Types;
  * }
  */
 class ToolInputSchema implements McpModel {
+    /**
+     * @readonly
+     * @var \Mcp\Types\ToolInputProperties
+     */
+    public $properties;
+    /**
+     * @var string[]|null
+     */
+    public $required;
     use ExtraFieldsTrait;
 
     /**
      * @param string[]|null $required
      */
-    public function __construct(
-        public readonly ToolInputProperties $properties = new ToolInputProperties(),
-        public ?array $required = null,
-    ) {}
+    public function __construct(?ToolInputProperties $properties = null, ?array $required = null)
+    {
+        $properties = $properties ?? new ToolInputProperties();
+        $this->properties = $properties;
+        $this->required = $required;
+    }
 
     public static function fromArray(array $data): self {
         $type = $data['type'] ?? '';
@@ -105,7 +116,10 @@ class ToolInputSchema implements McpModel {
         $this->properties->validate();
     }
 
-    public function jsonSerialize(): mixed {
+    /**
+     * @return mixed
+     */
+    public function jsonSerialize() {
         $data = [
             'type' => 'object',
         ];

@@ -57,17 +57,29 @@ use InvalidArgumentException;
  * and handles incoming messages by dispatching them to the appropriate handlers.
  */
 class Server {
+    /**
+     * @readonly
+     * @var string
+     */
+    private $name;
     /** @var array<string, callable(?array): Result> */
-    private array $requestHandlers = [];
+    private $requestHandlers = [];
     /** @var array<string, callable(?array): void> */
-    private array $notificationHandlers = [];
-    private ?ServerSession $session = null;
-    private LoggerInterface $logger;
+    private $notificationHandlers = [];
+    /**
+     * @var \Mcp\Server\ServerSession|null
+     */
+    private $session;
+    /**
+     * @var \Psr\Log\LoggerInterface
+     */
+    private $logger;
 
     public function __construct(
-        private readonly string $name,
+        string $name,
         ?LoggerInterface $logger = null
     ) {
+        $this->name = $name;
         $this->logger = $logger ?? new NullLogger();
         $this->logger->debug("Initializing server '$name'");
 
@@ -85,13 +97,13 @@ class Server {
         ?NotificationOptions $notificationOptions = null,
         ?array $experimentalCapabilities = null
     ): InitializationOptions {
-        $notificationOptions ??= new NotificationOptions();
-        $experimentalCapabilities ??= [];
+        $notificationOptions = $notificationOptions ?? new NotificationOptions();
+        $experimentalCapabilities = $experimentalCapabilities ?? [];
 
         return new InitializationOptions(
-            serverName: $this->name,
-            serverVersion: $this->getPackageVersion('mcp'),
-            capabilities: $this->getCapabilities($notificationOptions, $experimentalCapabilities)
+            $this->name,
+            $this->getPackageVersion('mcp'),
+            $this->getCapabilities($notificationOptions, $experimentalCapabilities)
         );
     }
 
@@ -110,20 +122,19 @@ class Server {
     
         if (isset($this->requestHandlers['prompts/list'])) {
             $promptsCapability = new ServerPromptsCapability(
-                listChanged: $notificationOptions->promptsChanged
+                $notificationOptions->promptsChanged
             );
         }
     
         if (isset($this->requestHandlers['resources/list'])) {
             $resourcesCapability = new ServerResourcesCapability(
-                subscribe: false, // Adjust based on your requirements
-                listChanged: $notificationOptions->resourcesChanged
+                $notificationOptions->resourcesChanged, false
             );
         }
     
         if (isset($this->requestHandlers['tools/list'])) {
             $toolsCapability = new ServerToolsCapability(
-                listChanged: $notificationOptions->toolsChanged
+                $notificationOptions->toolsChanged
             );
         }
     
@@ -133,13 +144,7 @@ class Server {
             );
         }
     
-        return new ServerCapabilities(
-            prompts: $promptsCapability,
-            resources: $resourcesCapability,
-            tools: $toolsCapability,
-            logging: $loggingCapability,
-            experimental: new ExperimentalCapabilities($experimentalCapabilities) // Assuming a constructor
-        );
+        return new ServerCapabilities($loggingCapability, null, $promptsCapability, $resourcesCapability, $toolsCapability, new ExperimentalCapabilities($experimentalCapabilities));
     }
 
     /**
@@ -198,8 +203,8 @@ class Server {
             if ($innerMessage instanceof \Mcp\Types\JSONRPCRequest) {
                 // Code -32603 is Internal error as per JSON-RPC spec
                 $this->sendError($innerMessage->id, new ErrorData(
-                    code: -32603,
-                    message: $e->getMessage()
+                    -32603,
+                    $e->getMessage()
                 ));
             }
         }
@@ -214,8 +219,7 @@ class Server {
 
         if ($handler === null) {
             throw new McpError(new TypesErrorData(
-                code: -32601, // Method not found
-                message: "Method not found: {$method}"
+                -32601, "Method not found: {$method}"
             ));
         }
 
@@ -264,9 +268,9 @@ class Server {
 
         // Create a JSONRPCResponse object and wrap in JsonRpcMessage
         $resp = new JSONRPCResponse(
-            jsonrpc: '2.0',
-            id: $id,
-            result: $result
+            '2.0',
+            $id,
+            $result
         );
         $resp->validate();
 
@@ -286,15 +290,15 @@ class Server {
         }
 
         $errorObj = new JsonRpcErrorObject(
-            code: $error->code,
-            message: $error->message,
-            data: $error->data ?? null
+            $error->code,
+            $error->message,
+            $error->data ?? null
         );
 
         $errResp = new JSONRPCError(
-            jsonrpc: '2.0',
-            id: $id,
-            error: $errorObj
+            '2.0',
+            $id,
+            $errorObj
         );
         $errResp->validate();
 

@@ -28,10 +28,8 @@ declare(strict_types=1);
 
 namespace Mcp\Types;
 
-/**
- * Role enum representing possible roles in the conversation
- */
-enum Role: string {
-    case ASSISTANT = 'assistant';
-    case USER = 'user';
+class Role
+{
+    public const ASSISTANT = 'assistant';
+    public const USER = 'user';
 }

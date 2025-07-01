@@ -38,13 +38,18 @@ use Mcp\Server\HttpServerRunner;
 class StandardPhpAdapter
 {
     /**
+     * @var HttpServerRunner
+     * @readonly
+     */
+    private $serverRunner;
+    /**
      * Constructor.
      *
      * @param HttpServerRunner $serverRunner HTTP server runner instance
      */
-    public function __construct(
-        private readonly HttpServerRunner $serverRunner
-    ) {
+    public function __construct(HttpServerRunner $serverRunner)
+    {
+        $this->serverRunner = $serverRunner;
     }
     
     /**

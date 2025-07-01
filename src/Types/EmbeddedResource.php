@@ -33,13 +33,28 @@ namespace Mcp\Types;
  * Embedded resource in a prompt or tool call result
  */
 class EmbeddedResource implements McpModel {
+    /**
+     * @readonly
+     * @var \Mcp\Types\ResourceContents
+     */
+    public $resource;
+    /**
+     * @readonly
+     * @var string
+     */
+    public $type = 'resource';
+    /**
+     * @var \Mcp\Types\Annotations|null
+     */
+    public $annotations;
     use ExtraFieldsTrait;
 
-    public function __construct(
-        public readonly ResourceContents $resource,
-        public readonly string $type = 'resource',
-        public ?Annotations $annotations = null,
-    ) {}
+    public function __construct(ResourceContents $resource, string $type = 'resource', ?Annotations $annotations = null)
+    {
+        $this->resource = $resource;
+        $this->type = $type;
+        $this->annotations = $annotations;
+    }
 
     public static function fromArray(array $data): self {
         $type = $data['type'] ?? 'resource';
@@ -82,7 +97,10 @@ class EmbeddedResource implements McpModel {
         }
     }
 
-    public function jsonSerialize(): mixed {
+    /**
+     * @return mixed
+     */
+    public function jsonSerialize() {
         $data = [
             'type' => $this->type,
             'resource' => $this->resource,

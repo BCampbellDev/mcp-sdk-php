@@ -33,11 +33,16 @@ namespace Mcp\Types;
  * According to the schema, `params` can have `_meta?: { progressToken?: ProgressToken }` and arbitrary fields.
  */
 class RequestParams implements McpModel {
+    /**
+     * @var \Mcp\Types\Meta|null
+     */
+    public $_meta;
     use ExtraFieldsTrait;
 
-    public function __construct(
-        public ?Meta $_meta = null,
-    ) {}
+    public function __construct(?Meta $_meta = null)
+    {
+        $this->_meta = $_meta;
+    }
 
     public function validate(): void {
         // No mandatory fields, just arbitrary data.
@@ -47,7 +52,10 @@ class RequestParams implements McpModel {
         }
     }
 
-    public function jsonSerialize(): mixed {
+    /**
+     * @return mixed
+     */
+    public function jsonSerialize() {
         $data = [];
         
         // If $_meta is non-null, let it be serialized, and only add if not empty

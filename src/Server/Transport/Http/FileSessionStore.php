@@ -31,8 +31,13 @@ namespace Mcp\Server\Transport\Http;
  */
 class FileSessionStore implements SessionStoreInterface
 {
-    public function __construct(private string $directory)
+    /**
+     * @var string
+     */
+    private $directory;
+    public function __construct(string $directory)
     {
+        $this->directory = $directory;
         // Ensure directory exists
         if (!is_dir($this->directory)) {
             mkdir($this->directory, 0750, true);

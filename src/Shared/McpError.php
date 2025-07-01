@@ -37,10 +37,16 @@ use Exception;
  * Wraps the ErrorData object in an exception for easy error handling.
  */
 class McpError extends Exception {
+    /**
+     * @readonly
+     * @var \Mcp\Shared\ErrorData
+     */
+    public $error;
     public function __construct(
-        public readonly ErrorData $error,
+        ErrorData $error,
         ?\Throwable $previous = null
     ) {
+        $this->error = $error;
         parent::__construct($error->message, $error->code, $previous);
     }
 }

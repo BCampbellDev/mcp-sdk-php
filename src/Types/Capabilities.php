@@ -38,11 +38,16 @@ namespace Mcp\Types;
  * }
  */
 abstract class Capabilities implements McpModel {
+    /**
+     * @var \Mcp\Types\ExperimentalCapabilities|null
+     */
+    public $experimental;
     use ExtraFieldsTrait;
 
-    public function __construct(
-        public ?ExperimentalCapabilities $experimental = null,
-    ) {}
+    public function __construct(?ExperimentalCapabilities $experimental = null)
+    {
+        $this->experimental = $experimental;
+    }
 
     public static function fromArray(array $data): self {
         $experimentalData = $data['experimental'] ?? null;
@@ -70,7 +75,10 @@ abstract class Capabilities implements McpModel {
         }
     }
 
-    public function jsonSerialize(): mixed {
+    /**
+     * @return mixed
+     */
+    public function jsonSerialize() {
         $data = [];
         if ($this->experimental !== null) {
             $data['experimental'] = $this->experimental;

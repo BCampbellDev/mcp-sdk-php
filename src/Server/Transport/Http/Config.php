@@ -41,7 +41,7 @@ class Config
      *
      * @var array
      */
-    private array $options = [
+    private $options = [
         'session_timeout' => 3600,     // 1 hour default
         'enable_sse' => false,         // Default disabled for compatibility
         'max_queue_size' => 1000,      // Maximum messages in queue

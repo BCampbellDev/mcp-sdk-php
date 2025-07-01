@@ -33,12 +33,23 @@ namespace Mcp\Types;
  * Identifies a prompt
  */
 class PromptReference implements McpModel {
+    /**
+     * @readonly
+     * @var string
+     */
+    public $name;
+    /**
+     * @readonly
+     * @var string
+     */
+    public $type = 'ref/prompt';
     use ExtraFieldsTrait;
 
-    public function __construct(
-        public readonly string $name,
-        public readonly string $type = 'ref/prompt',
-    ) {}
+    public function __construct(string $name, string $type = 'ref/prompt')
+    {
+        $this->name = $name;
+        $this->type = $type;
+    }
 
     public static function fromArray(array $data): self {
         $name = $data['name'] ?? '';
@@ -64,7 +75,10 @@ class PromptReference implements McpModel {
         }
     }
 
-    public function jsonSerialize(): mixed {
+    /**
+     * @return mixed
+     */
+    public function jsonSerialize() {
         $data = get_object_vars($this);
         return array_merge($data, $this->extraFields);
     }

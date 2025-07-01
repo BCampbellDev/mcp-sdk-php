@@ -33,10 +33,16 @@ namespace Mcp\Types;
  * Text content for messages
  */
 class TextContent extends Content {
+    /**
+     * @readonly
+     * @var string
+     */
+    public $text;
     public function __construct(
-        public readonly string $text,
-        ?Annotations $annotations = null,
+        string $text,
+        ?Annotations $annotations = null
     ) {
+        $this->text = $text;
         parent::__construct('text', $annotations);
     }
 
@@ -71,7 +77,10 @@ class TextContent extends Content {
         }
     }
 
-    public function jsonSerialize(): mixed {
+    /**
+     * @return mixed
+     */
+    public function jsonSerialize() {
         $data = parent::jsonSerialize();
         $data['text'] = $this->text;
         return $data;

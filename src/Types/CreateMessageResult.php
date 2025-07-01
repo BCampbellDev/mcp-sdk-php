@@ -34,13 +34,40 @@ namespace Mcp\Types;
  * content: TextContent | ImageContent
  */
 class CreateMessageResult extends Result {
+    /**
+     * @readonly
+     * @var \Mcp\Types\TextContent|\Mcp\Types\ImageContent
+     */
+    public $content;
+    /**
+     * @readonly
+     * @var string
+     */
+    public $model;
+    /**
+     * @readonly
+     * @var \Mcp\Types\Role
+     */
+    public $role;
+    /**
+     * @var string|null
+     */
+    public $stopReason;
+    /**
+     * @param \Mcp\Types\TextContent|\Mcp\Types\ImageContent $content
+     * @param \Mcp\Types\Role::* $role
+     */
     public function __construct(
-        public readonly TextContent|ImageContent $content,
-        public readonly string $model,
-        public readonly Role $role,
-        public ?string $stopReason = null,
-        ?Meta $_meta = null,
+        $content,
+        string $model,
+        $role,
+        ?string $stopReason = null,
+        ?Meta $_meta = null
     ) {
+        $this->content = $content;
+        $this->model = $model;
+        $this->role = $role;
+        $this->stopReason = $stopReason;
         parent::__construct($_meta);
     }
 
@@ -73,11 +100,16 @@ class CreateMessageResult extends Result {
         }
 
         $type = $contentData['type'];
-        $content = match($type) {
-            'text' => TextContent::fromArray($contentData),
-            'image' => ImageContent::fromArray($contentData),
-            default => throw new \InvalidArgumentException("Unknown content type: $type in CreateMessageResult")
-        };
+        switch ($type) {
+            case 'text':
+                $content = TextContent::fromArray($contentData);
+                break;
+            case 'image':
+                $content = ImageContent::fromArray($contentData);
+                break;
+            default:
+                throw new \InvalidArgumentException("Unknown content type: $type in CreateMessageResult");
+        }
 
         $obj = new self($content, $model, $role, $stopReason, $meta);
 

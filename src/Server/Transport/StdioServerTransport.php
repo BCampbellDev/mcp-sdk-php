@@ -58,9 +58,9 @@ class StdioServerTransport implements Transport {
     /** @var resource */
     private $stdout;
     /** @var array<string> */
-    private array $writeBuffer = [];
+    private $writeBuffer = [];
     /** @var bool */
-    private bool $isStarted = false;
+    private $isStarted = false;
 
     /**
      * StdioServerTransport constructor.
@@ -163,8 +163,8 @@ class StdioServerTransport implements Transport {
             // JSON parse error
             throw new McpError(
                 new TypesErrorData(
-                    code: -32700,
-                    message: 'Parse error: ' . $e->getMessage()
+                    -32700,
+                    'Parse error: ' . $e->getMessage()
                 )
             );
         }
@@ -201,8 +201,8 @@ class StdioServerTransport implements Transport {
             // For illustration, let's just throw an error:
             throw new McpError(
                 new TypesErrorData(
-                    code: -32600,
-                    message: 'Invalid Request: empty batch'
+                    -32600,
+                    'Invalid Request: empty batch'
                 )
             );
         }
@@ -213,8 +213,8 @@ class StdioServerTransport implements Transport {
                 // Each sub-message must be a valid JSON object
                 throw new McpError(
                     new TypesErrorData(
-                        code: -32600,
-                        message: 'Invalid sub-message in batch (not an object)'
+                        -32600,
+                        'Invalid sub-message in batch (not an object)'
                     )
                 );
             }
@@ -241,8 +241,8 @@ class StdioServerTransport implements Transport {
         if (!isset($data['jsonrpc']) || $data['jsonrpc'] !== '2.0') {
             throw new McpError(
                 new TypesErrorData(
-                    code: -32600,
-                    message: 'Invalid Request: jsonrpc version must be "2.0"'
+                    -32600,
+                    'Invalid Request: jsonrpc version must be "2.0"'
                 )
             );
         }
@@ -276,8 +276,8 @@ class StdioServerTransport implements Transport {
                 // Could not classify
                 throw new McpError(
                     new TypesErrorData(
-                        code: -32600,
-                        message: 'Invalid Request: could not determine message type'
+                        -32600,
+                        'Invalid Request: could not determine message type'
                     )
                 );
             }
@@ -288,8 +288,8 @@ class StdioServerTransport implements Transport {
             // Other exceptions become parse errors
             throw new McpError(
                 new TypesErrorData(
-                    code: -32700,
-                    message: 'Parse error: ' . $e->getMessage()
+                    -32700,
+                    'Parse error: ' . $e->getMessage()
                 )
             );
         }
@@ -303,20 +303,19 @@ class StdioServerTransport implements Transport {
         if (!isset($errorData['code']) || !isset($errorData['message'])) {
             throw new McpError(
                 new TypesErrorData(
-                    code: -32600,
-                    message: 'Invalid Request: error object must contain code and message'
+                    -32600,
+                    'Invalid Request: error object must contain code and message'
                 )
             );
         }
         $errorObj = new JsonRpcErrorObject(
-            code: $errorData['code'],
-            message: $errorData['message'],
-            data: $errorData['data'] ?? null
+            $errorData['code'],
+            $errorData['message'],
+            $errorData['data'] ?? null
         );
         $msg = new JSONRPCError(
-            jsonrpc: '2.0',
-            id: $id ?? new RequestId(''), // per JSON-RPC, error typically has an ID
-            error: $errorObj
+            '2.0',
+            $id ?? new RequestId(''), $errorObj
         );
         $msg->validate();
         return $msg;
@@ -332,10 +331,10 @@ class StdioServerTransport implements Transport {
             : null;
 
         $req = new JSONRPCRequest(
-            jsonrpc: '2.0',
-            id: $id,
-            method: $method,
-            params: $params
+            '2.0',
+            $id,
+            $params,
+            $method
         );
         $req->validate();
         return $req;
@@ -351,9 +350,9 @@ class StdioServerTransport implements Transport {
             : null;
 
         $not = new JSONRPCNotification(
-            jsonrpc: '2.0',
-            method: $method,
-            params: $params
+            '2.0',
+            $params,
+            $method
         );
         $not->validate();
         return $not;
@@ -374,9 +373,9 @@ class StdioServerTransport implements Transport {
             }
         }
         $resp = new JSONRPCResponse(
-            jsonrpc: '2.0',
-            id: $id,
-            result: $resultObj
+            '2.0',
+            $id,
+            $resultObj
         );
         $resp->validate();
         return $resp;
@@ -430,7 +429,7 @@ class StdioServerTransport implements Transport {
 
             // Handle partial writes by re-buffering the unwritten part
             if ($written < strlen($data)) {
-                $this->writeBuffer = [substr($data, $written), ...$this->writeBuffer];
+                $this->writeBuffer = array_merge([substr($data, $written)], $this->writeBuffer);
             } else {
                 break;
             }

@@ -51,21 +51,23 @@ use Mcp\Types\Meta;
       * Maximum buffer size for incomplete SSE events
       */
      private const MAX_BUFFER_SIZE = 1048576; // 1MB
-     
      /**
       * The HTTP configuration
+      * @var \Mcp\Client\Transport\HttpConfiguration
       */
-     private HttpConfiguration $config;
+     private $config;
      
      /**
       * The session manager
+      * @var \Mcp\Client\Transport\HttpSessionManager
       */
-     private HttpSessionManager $sessionManager;
+     private $sessionManager;
      
      /**
       * The logger instance
+      * @var \Psr\Log\LoggerInterface
       */
-     private LoggerInterface $logger;
+     private $logger;
      
      /**
       * The cURL handle for the SSE connection
@@ -74,33 +76,39 @@ use Mcp\Types\Meta;
      
      /**
       * Buffer for incomplete SSE events
+      * @var string
       */
-     private string $buffer = '';
+     private $buffer = '';
      
      /**
       * Queue of parsed JsonRpcMessage objects
+      * @var mixed[]
       */
-     private array $messageQueue = [];
+     private $messageQueue = [];
      
      /**
       * The last event ID received
+      * @var string|null
       */
-     private ?string $lastEventId = null;
+     private $lastEventId;
      
      /**
       * Whether the connection is active
+      * @var bool
       */
-     private bool $active = false;
+     private $active = false;
      
      /**
       * Whether we're using a background process
+      * @var bool
       */
-     private bool $usingBackground = false;
+     private $usingBackground = false;
      
      /**
       * PID of the background process if used
+      * @var int|null
       */
-     private ?int $backgroundPid = null;
+     private $backgroundPid;
      
      /**
       * File handle for IPC with background process
@@ -109,8 +117,9 @@ use Mcp\Types\Meta;
      
      /**
       * Path to the IPC file
+      * @var string|null
       */
-     private ?string $ipcPath = null;
+     private $ipcPath;
      
      /**
       * Creates a new SSE connection manager.
@@ -556,10 +565,10 @@ use Mcp\Types\Meta;
                 }
 
                 return new JsonRpcMessage(new JSONRPCRequest(
-                    jsonrpc: '2.0',
-                    id: new RequestId($data['id']),
-                    method: $data['method'],
-                    params: $params
+                    '2.0',
+                    new RequestId($data['id']),
+                    $params,
+                    $data['method']
                 ));
             } else {
                 // Notification
@@ -571,9 +580,9 @@ use Mcp\Types\Meta;
                 }
 
                 return new JsonRpcMessage(new JSONRPCNotification(
-                    jsonrpc: '2.0',
-                    method: $data['method'],
-                    params: $params
+                    '2.0',
+                    $params,
+                    $data['method']
                 ));
             }
          } elseif (isset($data['id'])) {
@@ -582,20 +591,20 @@ use Mcp\Types\Meta;
                  // Error
                  $error = $data['error'];
                  return new JsonRpcMessage(new JSONRPCError(
-                     jsonrpc: '2.0',
-                     id: new RequestId($data['id']),
-                     error: new JsonRpcErrorObject(
-                         code: $error['code'],
-                         message: $error['message'],
-                         data: $error['data'] ?? null
+                     '2.0',
+                     new RequestId($data['id']),
+                     new JsonRpcErrorObject(
+                         $error['code'],
+                         $error['message'],
+                         $error['data'] ?? null
                      )
                  ));
              } else {
                  // Response
                  return new JsonRpcMessage(new JSONRPCResponse(
-                     jsonrpc: '2.0',
-                     id: new RequestId($data['id']),
-                     result: $data['result'] ?? null
+                     '2.0',
+                     new RequestId($data['id']),
+                     $data['result'] ?? null
                  ));
              }
          }

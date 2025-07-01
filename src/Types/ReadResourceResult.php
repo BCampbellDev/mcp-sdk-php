@@ -31,12 +31,18 @@ namespace Mcp\Types;
 
 class ReadResourceResult extends Result {
     /**
+     * @var (TextResourceContents|BlobResourceContents)[]
+     * @readonly
+     */
+    public $contents;
+    /**
      * @param (TextResourceContents|BlobResourceContents)[] $contents
      */
     public function __construct(
-        public readonly array $contents,
-        ?Meta $_meta = null,
+        array $contents,
+        ?Meta $_meta = null
     ) {
+        $this->contents = $contents;
         parent::__construct($_meta);
     }
 
@@ -89,7 +95,10 @@ class ReadResourceResult extends Result {
         }
     }
 
-    public function jsonSerialize(): mixed {
+    /**
+     * @return mixed
+     */
+    public function jsonSerialize() {
         $data = parent::jsonSerialize();
         $data['contents'] = $this->contents;
         return $data;

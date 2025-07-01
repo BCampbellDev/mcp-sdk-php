@@ -31,13 +31,19 @@ namespace Mcp\Types;
 
 class ListToolsResult extends PaginatedResult {
     /**
+     * @var Tool[]
+     * @readonly
+     */
+    public $tools;
+    /**
      * @param Tool[] $tools
      */
     public function __construct(
-        public readonly array $tools,
+        array $tools,
         ?string $nextCursor = null,
-        ?Meta $_meta = null,
+        ?Meta $_meta = null
     ) {
+        $this->tools = $tools;
         parent::__construct($nextCursor, $_meta);
     }
 
@@ -76,7 +82,10 @@ class ListToolsResult extends PaginatedResult {
         }
     }
 
-    public function jsonSerialize(): mixed {
+    /**
+     * @return mixed
+     */
+    public function jsonSerialize() {
         $data = parent::jsonSerialize();
         $data['tools'] = $this->tools;
         return $data;

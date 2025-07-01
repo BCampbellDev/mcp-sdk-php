@@ -32,7 +32,10 @@ namespace Mcp\Types;
  * Trait to be used by classes that are Annotated
  */
 trait AnnotatedTrait {
-    public ?Annotations $annotations = null;
+    /**
+     * @var \Mcp\Types\Annotations|null
+     */
+    public $annotations;
 
     public function setAnnotations(?Annotations $annotations): void {
         $this->annotations = $annotations;

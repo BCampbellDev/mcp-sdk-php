@@ -106,7 +106,7 @@ class HttpServerSession extends ServerSession
             if (is_array($rootsData)) {
                 // Instantiate ClientRootsCapability based on roots data
                 $roots = new ClientRootsCapability(
-                    listChanged: $rootsData['listChanged'] ?? false
+                    $rootsData['listChanged'] ?? false
                 );
             }
     
@@ -115,15 +115,15 @@ class HttpServerSession extends ServerSession
     
             // Instantiate Implementation for clientInfo
             $clientInfo = new Implementation(
-                name: $clientParamsData['clientInfo']['name'] ?? '',
-                version: $clientParamsData['clientInfo']['version'] ?? ''
+                $clientParamsData['clientInfo']['name'] ?? '',
+                $clientParamsData['clientInfo']['version'] ?? ''
             );
     
             // Now instantiate InitializeRequestParams
             $initParams = new InitializeRequestParams(
-                protocolVersion: $clientParamsData['protocolVersion'] ?? '',
-                capabilities: $capabilities,
-                clientInfo: $clientInfo
+                $clientParamsData['protocolVersion'] ?? '',
+                $capabilities,
+                $clientInfo
             );
     
             $session->clientParams = $initParams;

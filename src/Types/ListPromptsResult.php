@@ -31,13 +31,19 @@ namespace Mcp\Types;
 
 class ListPromptsResult extends PaginatedResult {
     /**
+     * @var Prompt[]
+     * @readonly
+     */
+    public $prompts;
+    /**
      * @param Prompt[] $prompts
      */
     public function __construct(
-        public readonly array $prompts,
+        array $prompts,
         ?string $nextCursor = null,
-        ?Meta $_meta = null,
+        ?Meta $_meta = null
     ) {
+        $this->prompts = $prompts;
         parent::__construct($nextCursor, $_meta);
     }
 
@@ -76,7 +82,10 @@ class ListPromptsResult extends PaginatedResult {
         }
     }
 
-    public function jsonSerialize(): mixed {
+    /**
+     * @return mixed
+     */
+    public function jsonSerialize() {
         $data = parent::jsonSerialize();
         $data['prompts'] = $this->prompts;
         return $data;

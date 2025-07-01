@@ -29,12 +29,30 @@ declare(strict_types=1);
 namespace Mcp\Types;
 
 class InitializeRequestParams extends RequestParams {
+    /**
+     * @readonly
+     * @var string
+     */
+    public $protocolVersion;
+    /**
+     * @readonly
+     * @var \Mcp\Types\ClientCapabilities
+     */
+    public $capabilities;
+    /**
+     * @readonly
+     * @var \Mcp\Types\Implementation
+     */
+    public $clientInfo;
     public function __construct(
-        public readonly string $protocolVersion,
-        public readonly ClientCapabilities $capabilities,
-        public readonly Implementation $clientInfo,
+        string $protocolVersion,
+        ClientCapabilities $capabilities,
+        Implementation $clientInfo,
         ?Meta $_meta = null
     ) {
+        $this->protocolVersion = $protocolVersion;
+        $this->capabilities = $capabilities;
+        $this->clientInfo = $clientInfo;
         // Call parent constructor, passing $_meta if needed. If you don't have meta for Initialize, you can just pass null.
         parent::__construct($_meta);
     }
@@ -50,7 +68,10 @@ class InitializeRequestParams extends RequestParams {
         $this->clientInfo->validate();
     }
 
-    public function jsonSerialize(): mixed {
+    /**
+     * @return mixed
+     */
+    public function jsonSerialize() {
         $data = [
             'protocolVersion' => $this->protocolVersion,
             'capabilities' => $this->capabilities,

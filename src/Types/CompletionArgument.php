@@ -36,12 +36,23 @@ namespace Mcp\Types;
  * }
  */
 class CompletionArgument implements McpModel {
+    /**
+     * @readonly
+     * @var string
+     */
+    public $name;
+    /**
+     * @readonly
+     * @var string
+     */
+    public $value;
     use ExtraFieldsTrait;
 
-    public function __construct(
-        public readonly string $name,
-        public readonly string $value,
-    ) {}
+    public function __construct(string $name, string $value)
+    {
+        $this->name = $name;
+        $this->value = $value;
+    }
 
     public function validate(): void {
         if (empty($this->name)) {
@@ -52,7 +63,10 @@ class CompletionArgument implements McpModel {
         }
     }
 
-    public function jsonSerialize(): mixed {
+    /**
+     * @return mixed
+     */
+    public function jsonSerialize() {
         $data = get_object_vars($this);
         return array_merge($data, $this->extraFields);
     }

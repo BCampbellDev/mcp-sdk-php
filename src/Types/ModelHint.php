@@ -30,11 +30,16 @@ declare(strict_types=1);
 namespace Mcp\Types;
 
 class ModelHint implements McpModel {
+    /**
+     * @var string|null
+     */
+    public $name;
     use ExtraFieldsTrait;
 
-    public function __construct(
-        public ?string $name = null,
-    ) {}
+    public function __construct(?string $name = null)
+    {
+        $this->name = $name;
+    }
 
     public static function fromArray(array $data): self {
         $name = $data['name'] ?? null;
@@ -54,7 +59,10 @@ class ModelHint implements McpModel {
         // No required fields
     }
 
-    public function jsonSerialize(): mixed {
+    /**
+     * @return mixed
+     */
+    public function jsonSerialize() {
         $data = [];
         if ($this->name !== null) {
             $data['name'] = $this->name;

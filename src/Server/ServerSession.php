@@ -59,21 +59,45 @@ use InvalidArgumentException;
  * Similar to Python's ServerSession, but synchronous and integrated with our PHP classes.
  */
 class ServerSession extends BaseSession {
-    protected InitializationState $initializationState = InitializationState::NotInitialized;
-    protected ?InitializeRequestParams $clientParams = null;
-    protected LoggerInterface $logger;
-    protected string $negotiatedProtocolVersion = Version::LATEST_PROTOCOL_VERSION;
+    /**
+     * @readonly
+     * @var \Mcp\Server\Transport\Transport
+     */
+    protected $transport;
+    /**
+     * @readonly
+     * @var \Mcp\Server\InitializationOptions
+     */
+    protected $initOptions;
+    /**
+     * @var \Mcp\Server\InitializationState
+     */
+    protected $initializationState = InitializationState::NotInitialized;
+    /**
+     * @var \Mcp\Types\InitializeRequestParams|null
+     */
+    protected $clientParams;
+    /**
+     * @var \Psr\Log\LoggerInterface
+     */
+    protected $logger;
+    /**
+     * @var string
+     */
+    protected $negotiatedProtocolVersion = Version::LATEST_PROTOCOL_VERSION;
 
     public function __construct(
-        protected readonly Transport $transport,
-        protected readonly InitializationOptions $initOptions,
+        Transport $transport,
+        InitializationOptions $initOptions,
         ?LoggerInterface $logger = null
     ) {
+        $this->transport = $transport;
+        $this->initOptions = $initOptions;
         $this->logger = $logger ?? new NullLogger();
         // The server receives ClientRequest and ClientNotification from the client
         parent::__construct(
-            receiveRequestType: ClientRequest::class,
-            receiveNotificationType: ClientNotification::class
+            ClientRequest::class,
+            ClientNotification::class
         );
 
         // Register handlers for incoming requests and notifications
@@ -171,7 +195,9 @@ class ServerSession extends BaseSession {
         $params = $actualRequest->params ?? [];
 
         if ($method === 'initialize') {
-            $respond = fn($result) => $responder->sendResponse($result);
+            $respond = function ($result) use ($responder) {
+                return $responder->sendResponse($result);
+            };
             $this->handleInitialize($request, $respond);
             return;
         }
@@ -241,12 +267,12 @@ class ServerSession extends BaseSession {
         $this->negotiatedProtocolVersion = $this->negotiateProtocolVersion($clientProtocolVersion);
         
         $result = new InitializeResult(
-            protocolVersion: $this->negotiatedProtocolVersion,
-            capabilities: $this->initOptions->capabilities,
-            serverInfo: new Implementation(
-                name: $this->initOptions->serverName,
-                version: $this->initOptions->serverVersion
-            )
+            $this->initOptions->capabilities,
+            new Implementation(
+                $this->initOptions->serverName,
+                $this->initOptions->serverVersion
+            ),
+            $this->negotiatedProtocolVersion
         );
     
         $respond($result);
@@ -285,7 +311,7 @@ class ServerSession extends BaseSession {
      */
     public function sendLogMessage(
         LoggingLevel $level,
-        mixed $data,
+        $data,
         ?string $logger = null
     ): void {
         $params = [
@@ -302,9 +328,9 @@ class ServerSession extends BaseSession {
         }
 
         $jsonRpcNotification = new JSONRPCNotification(
-            jsonrpc: '2.0',
-            method: 'notifications/message',
-            params: $notificationParams
+            '2.0',
+            $notificationParams,
+            'notifications/message'
         );
 
         $notification = new JsonRpcMessage($jsonRpcNotification);
@@ -328,9 +354,9 @@ class ServerSession extends BaseSession {
         }
 
         $jsonRpcNotification = new JSONRPCNotification(
-            jsonrpc: '2.0',
-            method: 'notifications/resources/updated',
-            params: $notificationParams
+            '2.0',
+            $notificationParams,
+            'notifications/resources/updated'
         );
 
         $notification = new JsonRpcMessage($jsonRpcNotification);
@@ -346,7 +372,7 @@ class ServerSession extends BaseSession {
      * @param float|null $total The total progress value.
      */
     public function writeProgressNotification(
-        string|int $progressToken,
+        $progressToken,
         float $progress,
         ?float $total = null
     ): void {
@@ -364,9 +390,9 @@ class ServerSession extends BaseSession {
         }
 
         $jsonRpcNotification = new JSONRPCNotification(
-            jsonrpc: '2.0',
-            method: 'notifications/progress',
-            params: $notificationParams
+            '2.0',
+            $notificationParams,
+            'notifications/progress'
         );
 
         $notification = new JsonRpcMessage($jsonRpcNotification);
@@ -439,7 +465,7 @@ class ServerSession extends BaseSession {
      * @param mixed $response The response object to adapt
      * @return mixed The adapted response
      */
-    public function adaptResponseForClient($response): mixed {
+    public function adaptResponseForClient($response) {
         // No adaptation needed if client supports the latest version
         if ($this->negotiatedProtocolVersion === Version::LATEST_PROTOCOL_VERSION) {
             return $response;
@@ -556,9 +582,9 @@ class ServerSession extends BaseSession {
         }
 
         $jsonRpcNotification = new JSONRPCNotification(
-            jsonrpc: '2.0',
-            method: $method,
-            params: $notificationParams
+            '2.0',
+            $notificationParams,
+            $method
         );
 
         $notification = new JsonRpcMessage($jsonRpcNotification);
@@ -595,9 +621,9 @@ class ServerSession extends BaseSession {
             if ($adaptedResult !== $responseResult) {
                 // Create a new response with the adapted result
                 $innerMessage = new JSONRPCResponse(
-                    jsonrpc: $innerMessage->jsonrpc,
-                    id: $innerMessage->id,
-                    result: $adaptedResult
+                    $innerMessage->jsonrpc,
+                    $innerMessage->id,
+                    $adaptedResult
                 );
                 $message = new JsonRpcMessage($innerMessage);
             }

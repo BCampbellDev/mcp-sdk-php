@@ -30,17 +30,34 @@ declare(strict_types=1);
 namespace Mcp\Types;
 
 class ModelPreferences implements McpModel {
+    /**
+     * @var float|null
+     */
+    public $costPriority;
+    /**
+     * @var float|null
+     */
+    public $speedPriority;
+    /**
+     * @var float|null
+     */
+    public $intelligencePriority;
+    /**
+     * @var ModelHint[]
+     */
+    public $hints = [];
     use ExtraFieldsTrait;
 
     /**
      * @param ModelHint[] $hints
      */
-    public function __construct(
-        public ?float $costPriority = null,
-        public ?float $speedPriority = null,
-        public ?float $intelligencePriority = null,
-        public array $hints = [],
-    ) {}
+    public function __construct(?float $costPriority = null, ?float $speedPriority = null, ?float $intelligencePriority = null, array $hints = [])
+    {
+        $this->costPriority = $costPriority;
+        $this->speedPriority = $speedPriority;
+        $this->intelligencePriority = $intelligencePriority;
+        $this->hints = $hints;
+    }
 
     public function addHint(ModelHint $hint): void {
         $this->hints[] = $hint;
@@ -64,10 +81,10 @@ class ModelPreferences implements McpModel {
         }
 
         $obj = new self(
-            costPriority: $costPriority !== null ? (float)$costPriority : null,
-            speedPriority: $speedPriority !== null ? (float)$speedPriority : null,
-            intelligencePriority: $intelligencePriority !== null ? (float)$intelligencePriority : null,
-            hints: $hints
+            $costPriority !== null ? (float)$costPriority : null,
+            $speedPriority !== null ? (float)$speedPriority : null,
+            $intelligencePriority !== null ? (float)$intelligencePriority : null,
+            $hints
         );
 
         foreach ($data as $k => $v) {
@@ -92,7 +109,10 @@ class ModelPreferences implements McpModel {
         }
     }
 
-    public function jsonSerialize(): mixed {
+    /**
+     * @return mixed
+     */
+    public function jsonSerialize() {
         $data = [];
         if ($this->costPriority !== null) {
             $data['costPriority'] = $this->costPriority;

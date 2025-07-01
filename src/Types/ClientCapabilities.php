@@ -41,11 +41,21 @@ namespace Mcp\Types;
  * We have a SamplingCapability class for sampling.
  */
 class ClientCapabilities extends Capabilities {
+    /**
+     * @var \Mcp\Types\ClientRootsCapability|null
+     */
+    public $roots;
+    /**
+     * @var \Mcp\Types\SamplingCapability|null
+     */
+    public $sampling;
     public function __construct(
-        public ?ClientRootsCapability $roots = null,
-        public ?SamplingCapability $sampling = null,
-        ?ExperimentalCapabilities $experimental = null,
+        ?ClientRootsCapability $roots = null,
+        ?SamplingCapability $sampling = null,
+        ?ExperimentalCapabilities $experimental = null
     ) {
+        $this->roots = $roots;
+        $this->sampling = $sampling;
         parent::__construct($experimental);
     }
 
@@ -59,7 +69,10 @@ class ClientCapabilities extends Capabilities {
         }
     }
 
-    public function jsonSerialize(): mixed {
+    /**
+     * @return mixed
+     */
+    public function jsonSerialize() {
         $data = parent::jsonSerialize();
         if ($this->roots !== null) {
             $data['roots'] = $this->roots;

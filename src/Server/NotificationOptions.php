@@ -34,9 +34,25 @@ use RuntimeException;
  * Options for server notifications
  */
 class NotificationOptions {
-    public function __construct(
-        public readonly bool $promptsChanged = false,
-        public readonly bool $resourcesChanged = false,
-        public readonly bool $toolsChanged = false
-    ) {}
+    /**
+     * @readonly
+     * @var bool
+     */
+    public $promptsChanged = false;
+    /**
+     * @readonly
+     * @var bool
+     */
+    public $resourcesChanged = false;
+    /**
+     * @readonly
+     * @var bool
+     */
+    public $toolsChanged = false;
+    public function __construct(bool $promptsChanged = false, bool $resourcesChanged = false, bool $toolsChanged = false)
+    {
+        $this->promptsChanged = $promptsChanged;
+        $this->resourcesChanged = $resourcesChanged;
+        $this->toolsChanged = $toolsChanged;
+    }
 }

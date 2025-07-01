@@ -33,11 +33,17 @@ namespace Mcp\Types;
  * { uri: string }
  */
 class SubscribeRequestParams implements McpModel {
+    /**
+     * @readonly
+     * @var string
+     */
+    public $uri;
     use ExtraFieldsTrait;
 
-    public function __construct(
-        public readonly string $uri
-    ) {}
+    public function __construct(string $uri)
+    {
+        $this->uri = $uri;
+    }
 
     public function validate(): void {
         if (empty($this->uri)) {
@@ -45,6 +51,10 @@ class SubscribeRequestParams implements McpModel {
         }
     }
 
-    public function jsonSerialize(): mixed {
+    /**
+     * @return mixed
+     */
+    public function jsonSerialize() {
         return array_merge(['uri' => $this->uri], $this->extraFields);
     }
+}

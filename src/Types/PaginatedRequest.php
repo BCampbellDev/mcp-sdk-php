@@ -34,7 +34,7 @@ namespace Mcp\Types;
 abstract class PaginatedRequest extends Request {
     public function __construct(
         string $method,
-        ?string $cursor = null,
+        ?string $cursor = null
     ) {
         // Instead of passing cursor directly to Request, we create PaginatedRequestParams
         // and pass as params.

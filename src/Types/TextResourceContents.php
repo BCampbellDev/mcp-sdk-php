@@ -30,11 +30,17 @@ declare(strict_types=1);
 namespace Mcp\Types;
 
 class TextResourceContents extends ResourceContents {
+    /**
+     * @readonly
+     * @var string
+     */
+    public $text;
     public function __construct(
-        public readonly string $text,
+        string $text,
         string $uri,
-        ?string $mimeType = null,
+        ?string $mimeType = null
     ) {
+        $this->text = $text;
         parent::__construct($uri, $mimeType);
     }
 
@@ -67,7 +73,10 @@ class TextResourceContents extends ResourceContents {
         }
     }
 
-    public function jsonSerialize(): mixed {
+    /**
+     * @return mixed
+     */
+    public function jsonSerialize() {
         $data = parent::jsonSerialize();
         $data['text'] = $this->text;
         return $data;

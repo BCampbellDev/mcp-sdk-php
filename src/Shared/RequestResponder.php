@@ -42,8 +42,34 @@ use RuntimeException;
  * Here, we assume `$request` is a typed request (McpModel) and `$params` are its parameters.
  */
 class RequestResponder {
-    private bool $responded = false;
-    private ?Meta $requestMeta = null;
+    /**
+     * @var RequestId
+     * @readonly
+     */
+    private $requestId;
+    /**
+     * @var array
+     * @readonly
+     */
+    private $params;
+    /**
+     * @var McpModel
+     * @readonly
+     */
+    private $request;
+    /**
+     * @var BaseSession
+     * @readonly
+     */
+    private $session;
+    /**
+     * @var bool
+     */
+    private $responded = false;
+    /**
+     * @var \Mcp\Types\Meta|null
+     */
+    private $requestMeta;
 
     /**
      * @param RequestId $requestId The ID of the request being handled.
@@ -52,20 +78,24 @@ class RequestResponder {
      * @param BaseSession $session The session handling communication.
      */
     public function __construct(
-        private readonly RequestId $requestId,
-        private readonly array $params,
-        private readonly McpModel $request,
-        private readonly BaseSession $session,
+        RequestId $requestId,
+        array $params,
+        McpModel $request,
+        BaseSession $session
     ) {
+        $this->requestId = $requestId;
+        $this->params = $params;
+        $this->request = $request;
+        $this->session = $session;
         $this->extractMeta();
     }
 
     /**
      * Sends a response to the request. The response can be a typed result or an ErrorData object for errors.
      *
-     * @param McpModel|ErrorData $response
+     * @param mixed $response
      */
-    public function respond(mixed $response): void {
+    public function respond($response): void {
         if ($this->responded) {
             throw new RuntimeException('Request already responded to');
         }
@@ -74,7 +104,10 @@ class RequestResponder {
         $this->session->sendResponse($this->requestId, $response);
     }
 
-    public function sendResponse(mixed $response): void {
+    /**
+     * @param mixed $response
+     */
+    public function sendResponse($response): void {
         $this->respond($response);
     }
 

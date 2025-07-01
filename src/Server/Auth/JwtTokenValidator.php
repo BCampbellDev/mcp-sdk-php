@@ -32,12 +32,32 @@ namespace Mcp\Server\Auth;
  */
 class JwtTokenValidator implements TokenValidatorInterface
 {
-    public function __construct(
-        private readonly string $key,
-        private readonly string $algorithm = 'HS256',
-        private readonly ?string $issuer = null,
-        private readonly ?string $audience = null,
-    ) {
+    /**
+     * @readonly
+     * @var string
+     */
+    private $key;
+    /**
+     * @readonly
+     * @var string
+     */
+    private $algorithm = 'HS256';
+    /**
+     * @readonly
+     * @var string|null
+     */
+    private $issuer;
+    /**
+     * @readonly
+     * @var string|null
+     */
+    private $audience;
+    public function __construct(string $key, string $algorithm = 'HS256', ?string $issuer = null, ?string $audience = null)
+    {
+        $this->key = $key;
+        $this->algorithm = $algorithm;
+        $this->issuer = $issuer;
+        $this->audience = $audience;
     }
 
     public function validate(string $token): TokenValidationResult

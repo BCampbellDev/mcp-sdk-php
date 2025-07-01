@@ -32,12 +32,22 @@ namespace Mcp\Types;
  * Base class for all notifications
  */
 abstract class Notification implements McpModel {
+    /**
+     * @readonly
+     * @var string
+     */
+    public $method;
+    /**
+     * @var \Mcp\Types\NotificationParams|null
+     */
+    public $params;
     use ExtraFieldsTrait;
 
-    public function __construct(
-        public readonly string $method,
-        public ?NotificationParams $params = null,
-    ) {}
+    public function __construct(string $method, ?NotificationParams $params = null)
+    {
+        $this->method = $method;
+        $this->params = $params;
+    }
 
     public function validate(): void {
         if (empty($this->method)) {
@@ -48,7 +58,10 @@ abstract class Notification implements McpModel {
         }
     }
 
-    public function jsonSerialize(): mixed {
+    /**
+     * @return mixed
+     */
+    public function jsonSerialize() {
         $data = [];
 
         // Only include "method" if not empty

@@ -60,13 +60,13 @@ class StdioTransport {
     private $process = null;
 
     /** @var array<int, resource> */
-    private array $pipes = [];
+    private $pipes = [];
 
     /** @var StdioServerParameters */
-    private StdioServerParameters $parameters;
+    private $parameters;
 
     /** @var LoggerInterface */
-    private LoggerInterface $logger;
+    private $logger;
 
     /**
      * StdioTransport constructor.
@@ -112,11 +112,31 @@ class StdioTransport {
         // Set non-blocking mode for STDOUT and STDERR.
         stream_set_blocking($this->pipes[1], false);
         stream_set_blocking($this->pipes[2], false);
+        // Initialize read and write streams.
+        $arrayIsListFunction = function (array $array): bool {
+            if (function_exists('array_is_list')) {
+                return array_is_list($array);
+            }
+            if ($array === []) {
+                return true;
+            }
+            $current_key = 0;
+            foreach ($array as $key => $noop) {
+                if ($key !== $current_key) {
+                    return false;
+                }
+                ++$current_key;
+            }
+            return true;
+        };
 
         // Initialize read and write streams.
         $readStream = new class($this->pipes[1], $this->logger, $this->process) extends MemoryStream {
             private $pipe;
-            private LoggerInterface $logger;
+            /**
+             * @var \Psr\Log\LoggerInterface
+             */
+            private $logger;
             private $process;
 
             public function __construct($pipe, LoggerInterface $logger, $process) {
@@ -131,13 +151,13 @@ class StdioTransport {
              *
              * @return JsonRpcMessage|Exception|null The received message, an exception, or null if no message is available.
              */
-            public function receive(): mixed {
+            public function receive() {
                 $buffer = '';
                 while (($chunk = fgets($this->pipe)) !== false) {
                     $buffer .= $chunk;
 
                     // Assuming each message is delimited by a newline.
-                    if (str_ends_with(trim($buffer), '}') || str_ends_with(trim($buffer), ']')) {
+                    if (substr_compare(trim($buffer), '}', -strlen('}')) === 0 || substr_compare(trim($buffer), ']', -strlen(']')) === 0) {
                         try {
                             $data = json_decode(trim($buffer), true, 512, JSON_THROW_ON_ERROR);
                             $jsonRpcMessage = $this->instantiateJsonRpcMessage($data);
@@ -227,10 +247,10 @@ class StdioTransport {
                         }
 
                         return new JsonRpcMessage(new JSONRPCRequest(
-                            jsonrpc: '2.0',
-                            id: new RequestId($data['id']),
-                            method: $data['method'],
-                            params: $params
+                            '2.0',
+                            new RequestId($data['id']),
+                            $params,
+                            $data['method']
                         ));
                     } else {
                         // notification
@@ -242,9 +262,9 @@ class StdioTransport {
                         }
 
                         return new JsonRpcMessage(new JSONRPCNotification(
-                            jsonrpc: '2.0',
-                            method: $data['method'],
-                            params: $params
+                            '2.0',
+                            $params,
+                            $data['method']
                         ));
                     }
                 }
@@ -254,20 +274,20 @@ class StdioTransport {
                     // error response
                     $errorData = $data['error'];
                     return new JsonRpcMessage(new JSONRPCError(
-                        jsonrpc: '2.0',
-                        id: isset($data['id']) ? new RequestId($data['id']) : null,
-                        error: new JsonRpcErrorObject(
-                            code: $errorData['code'],
-                            message: $errorData['message'],
-                            data: $errorData['data'] ?? null
+                        '2.0',
+                        isset($data['id']) ? new RequestId($data['id']) : null,
+                        new JsonRpcErrorObject(
+                            $errorData['code'],
+                            $errorData['message'],
+                            $errorData['data'] ?? null
                         )
                     ));
                 } else {
                     // success response
                     return new JsonRpcMessage(new JSONRPCResponse(
-                        jsonrpc: '2.0',
-                        id: isset($data['id']) ? new RequestId($data['id']) : null,
-                        result: $data['result'] ?? null
+                        '2.0',
+                        isset($data['id']) ? new RequestId($data['id']) : null,
+                        $data['result'] ?? null
                     ));
                 }
             }
@@ -276,7 +296,7 @@ class StdioTransport {
              * Simple check if $data is a "list array" (i.e. numeric keys).
              */
             private function isListArray(array $data): bool {
-                return array_is_list($data);
+                return $arrayIsListFunction($data);
                 // or older PHP: return array_keys($data) === range(0, count($data)-1);
             }
 
@@ -331,7 +351,10 @@ class StdioTransport {
 
         $writeStream = new class($this->pipes[0], $this->logger, $this->process) extends MemoryStream {
             private $pipe;
-            private LoggerInterface $logger;
+            /**
+             * @var \Psr\Log\LoggerInterface
+             */
+            private $logger;
             private $process;
 
             public function __construct($pipe, LoggerInterface $logger, $process) {
@@ -344,14 +367,14 @@ class StdioTransport {
             /**
              * Send a JsonRpcMessage or Exception to the server.
              *
-             * @param JsonRpcMessage|Exception $message The JSON-RPC message or exception to send.
+             * @param mixed $message The JSON-RPC message or exception to send.
              *
              * @return void
              *
              * @throws InvalidArgumentException If the message is not a JsonRpcMessage.
              * @throws RuntimeException If writing to the pipe fails.
              */
-            public function send(mixed $message): void {
+            public function send($message): void {
                 if (!$message instanceof JsonRpcMessage) {
                     throw new InvalidArgumentException('Only JsonRpcMessage instances can be sent.');
                 }

@@ -42,13 +42,27 @@ namespace Mcp\Types;
  * }
  */
 class JSONRPCError implements McpModel {
+    /**
+     * @readonly
+     * @var string
+     */
+    public $jsonrpc;
+    /**
+     * @var \Mcp\Types\RequestId
+     */
+    public $id;
+    /**
+     * @var \Mcp\Types\JsonRpcErrorObject
+     */
+    public $error;
     use ExtraFieldsTrait;
 
-    public function __construct(
-        public readonly string $jsonrpc,
-        public RequestId $id,
-        public JsonRpcErrorObject $error,
-    ) {}
+    public function __construct(string $jsonrpc, RequestId $id, JsonRpcErrorObject $error)
+    {
+        $this->jsonrpc = $jsonrpc;
+        $this->id = $id;
+        $this->error = $error;
+    }
 
     public function validate(): void {
         if ($this->jsonrpc !== '2.0') {
@@ -58,7 +72,10 @@ class JSONRPCError implements McpModel {
         $this->error->validate();
     }
 
-    public function jsonSerialize(): mixed {
+    /**
+     * @return mixed
+     */
+    public function jsonSerialize() {
         $data = [
             'jsonrpc' => $this->jsonrpc,
             'id' => $this->id,

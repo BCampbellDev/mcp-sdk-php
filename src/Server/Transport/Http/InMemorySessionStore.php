@@ -34,7 +34,7 @@ class InMemorySessionStore implements SessionStoreInterface
     /**
      * @var array<string, HttpSession>
      */
-    private array $sessions = [];
+    private $sessions = [];
 
     public function load(string $sessionId): ?HttpSession
     {

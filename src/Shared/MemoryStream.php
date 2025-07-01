@@ -41,14 +41,14 @@ use Exception;
  */
 class MemoryStream {
     /** @var array<JsonRpcMessage|Exception> */
-    private array $queue = [];
+    private $queue = [];
 
     /**
      * Sends a message or an exception into the stream.
      *
      * @param mixed $item
      */
-    public function send(mixed $item): void {
+    public function send($item): void {
         $this->queue[] = $item;
     }
 
@@ -57,7 +57,7 @@ class MemoryStream {
      *
      * @return mixed Returns the next item or null if empty.
      */
-    public function receive(): mixed {
+    public function receive() {
         return array_shift($this->queue) ?? null;
     }
 

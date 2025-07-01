@@ -48,33 +48,39 @@
  class StreamableHttpTransport {
      /**
       * The session manager for handling MCP session state
+      * @var \Mcp\Client\Transport\HttpSessionManager
       */
-     private HttpSessionManager $sessionManager;
+     private $sessionManager;
      
      /**
       * The HTTP configuration
+      * @var \Mcp\Client\Transport\HttpConfiguration
       */
-     private HttpConfiguration $config;
+     private $config;
      
      /**
       * The logger instance
+      * @var \Psr\Log\LoggerInterface
       */
-     private LoggerInterface $logger;
+     private $logger;
      
      /**
       * The SSE connection (if active)
+      * @var \Mcp\Client\Transport\SseConnection|null
       */
-     private ?SseConnection $sseConnection = null;
+     private $sseConnection;
      
      /**
       * Whether to automatically attempt to use SSE
+      * @var bool
       */
-     private bool $autoSse;
+     private $autoSse;
      
      /**
       * Queue of pending SSE messages
+      * @var mixed[]
       */
-     private array $pendingMessages = [];
+     private $pendingMessages = [];
      
      /**
       * Creates a new StreamableHttpTransport.
@@ -297,9 +303,9 @@
                      $idObj = new RequestId($item['id']);
 
                      $inner = new JSONRPCResponse(
-                         jsonrpc: $item['jsonrpc'],
-                         id:      $idObj,
-                         result:  $item['result']
+                         $item['jsonrpc'],
+                         $idObj,
+                         $item['result']
                      );
                      $this->pendingMessages[] = new JsonRpcMessage($inner);
 
@@ -309,12 +315,12 @@
                      $idObj = new RequestId($item['id']);
 
                      $inner = new JSONRPCError(
-                         jsonrpc: $item['jsonrpc'],
-                         id:      $idObj,
-                         error:   new JsonRpcErrorObject(
-                             code:    $err['code'],
-                             message: $err['message'],
-                             data:    $err['data'] ?? null
+                         $item['jsonrpc'],
+                         $idObj,
+                         new JsonRpcErrorObject(
+                             $err['code'],
+                             $err['message'],
+                             $err['data'] ?? null
                          )
                      );
                      $this->pendingMessages[] = new JsonRpcMessage($inner);
@@ -443,7 +449,10 @@
       */
      private function createReadStream(): MemoryStream {
          return new class($this) extends MemoryStream {
-             private StreamableHttpTransport $transport;
+             /**
+              * @var \Mcp\Client\Transport\StreamableHttpTransport
+              */
+             private $transport;
              
              public function __construct(StreamableHttpTransport $transport) {
                  $this->transport = $transport;
@@ -454,7 +463,7 @@
               * 
               * @return JsonRpcMessage|null The received message or null if none available
               */
-             public function receive(): mixed {
+             public function receive(): ?\Mcp\Types\JsonRpcMessage {
                  // First check if we have any pending messages from the SSE connection
                  if ($message = $this->transport->receiveFromSse()) {
                      return $message;
@@ -478,7 +487,10 @@
       */
      private function createWriteStream(): MemoryStream {
          return new class($this) extends MemoryStream {
-             private StreamableHttpTransport $transport;
+             /**
+              * @var \Mcp\Client\Transport\StreamableHttpTransport
+              */
+             private $transport;
              
              public function __construct(StreamableHttpTransport $transport) {
                  $this->transport = $transport;
@@ -490,7 +502,7 @@
               * @param mixed $message The message to send
               * @throws InvalidArgumentException If the message is not a JsonRpcMessage
               */
-             public function send(mixed $message): void {
+             public function send($message): void {
                  if (!$message instanceof JsonRpcMessage) {
                      throw new InvalidArgumentException('StreamableHttpTransport can only send JsonRpcMessage objects');
                  }

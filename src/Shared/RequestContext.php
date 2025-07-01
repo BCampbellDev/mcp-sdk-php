@@ -39,7 +39,25 @@ use Mcp\Types\Meta;
  * Here, `meta` corresponds to params['_meta'] if present.
  */
 class RequestContext {
-    private ?Meta $meta = null;
+    /**
+     * @var RequestId
+     * @readonly
+     */
+    private $requestId;
+    /**
+     * @var array
+     * @readonly
+     */
+    private $params;
+    /**
+     * @var BaseSession
+     * @readonly
+     */
+    private $session;
+    /**
+     * @var \Mcp\Types\Meta|null
+     */
+    private $meta;
 
     /**
      * @param RequestId $requestId The unique ID of the request.
@@ -47,10 +65,13 @@ class RequestContext {
      * @param BaseSession $session The active session.
      */
     public function __construct(
-        private readonly RequestId $requestId,
-        private readonly array $params,
-        private readonly BaseSession $session,
+        RequestId $requestId,
+        array $params,
+        BaseSession $session
     ) {
+        $this->requestId = $requestId;
+        $this->params = $params;
+        $this->session = $session;
         $this->extractMeta();
     }
 

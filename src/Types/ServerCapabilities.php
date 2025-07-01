@@ -43,18 +43,46 @@ namespace Mcp\Types;
  * }
  */
 class ServerCapabilities extends Capabilities {
+    /**
+     * @var \Mcp\Types\ServerLoggingCapability|null
+     */
+    public $logging;
+    /**
+     * @var \Mcp\Types\ServerCompletionsCapability|null
+     */
+    public $completions;
+    /**
+     * @var \Mcp\Types\ServerPromptsCapability|null
+     */
+    public $prompts;
+    /**
+     * @var \Mcp\Types\ServerResourcesCapability|null
+     */
+    public $resources;
+    /**
+     * @var \Mcp\Types\ServerToolsCapability|null
+     */
+    public $tools;
     public function __construct(
-        public ?ServerLoggingCapability $logging = null,
-        public ?ServerCompletionsCapability $completions = null,
-        public ?ServerPromptsCapability $prompts = null,
-        public ?ServerResourcesCapability $resources = null,
-        public ?ServerToolsCapability $tools = null,
-        ?ExperimentalCapabilities $experimental = null,
+        ?ServerLoggingCapability $logging = null,
+        ?ServerCompletionsCapability $completions = null,
+        ?ServerPromptsCapability $prompts = null,
+        ?ServerResourcesCapability $resources = null,
+        ?ServerToolsCapability $tools = null,
+        ?ExperimentalCapabilities $experimental = null
     ) {
+        $this->logging = $logging;
+        $this->completions = $completions;
+        $this->prompts = $prompts;
+        $this->resources = $resources;
+        $this->tools = $tools;
         parent::__construct($experimental);
     }
 
-    public static function fromArray(array $data): self {
+    /**
+     * @return $this
+     */
+    public static function fromArray(array $data): \Mcp\Types\Capabilities {
         // Handle experimental from parent class
         $experimentalData = $data['experimental'] ?? null;
         unset($data['experimental']);
@@ -100,12 +128,12 @@ class ServerCapabilities extends Capabilities {
 
         // Construct ServerCapabilities object
         $obj = new self(
-            logging: $logging,
-            completions: $completions,
-            prompts: $prompts,
-            resources: $resources,
-            tools: $tools,
-            experimental: $experimental
+            $logging,
+            $completions,
+            $prompts,
+            $resources,
+            $tools,
+            $experimental
         );
 
         // Extra fields
@@ -136,7 +164,10 @@ class ServerCapabilities extends Capabilities {
         }
     }
 
-    public function jsonSerialize(): mixed {
+    /**
+     * @return mixed
+     */
+    public function jsonSerialize() {
         $data = parent::jsonSerialize();
         if ($this->logging !== null) {
             $data['logging'] = $this->logging;

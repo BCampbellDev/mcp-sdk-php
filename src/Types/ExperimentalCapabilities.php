@@ -51,7 +51,10 @@ class ExperimentalCapabilities implements McpModel {
         // No required fields.
     }
 
-    public function jsonSerialize(): mixed {
+    /**
+     * @return mixed
+     */
+    public function jsonSerialize() {
         // Just return extra fields
         return empty($this->extraFields) ? new \stdClass() : $this->extraFields;
     }

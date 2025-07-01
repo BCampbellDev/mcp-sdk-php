@@ -58,68 +58,69 @@ class HttpServerTransport implements Transport
      *
      * @var Config
      */
-    private Config $config;
+    private $config;
     
     /**
      * Message queue for incoming and outgoing messages.
      *
      * @var MessageQueue
      */
-    private MessageQueue $messageQueue;
+    private $messageQueue;
     
     /**
      * Session store.
      *
      * @var SessionStoreInterface
      */
-    private SessionStoreInterface $sessionStore;
+    private $sessionStore;
 
     /**
      * Active sessions.
      *
      * @var array<string, HttpSession>
      */
-    private array $sessions = [];
+    private $sessions = [];
     
     /**
      * Current session ID.
      *
      * @var string|null
      */
-    private ?string $currentSessionId = null;
+    private $currentSessionId;
     
     /**
      * Whether the transport is started.
      *
      * @var bool
      */
-    private bool $isStarted = false;
+    private $isStarted = false;
     
     /**
      * Last session cleanup time.
      *
      * @var int
      */
-    private int $lastSessionCleanup = 0;
+    private $lastSessionCleanup = 0;
     
     /**
      * Session cleanup interval in seconds.
      *
      * @var int
      */
-    private int $sessionCleanupInterval = 300; // 5 minutes
+    private $sessionCleanupInterval = 300; // 5 minutes
 
     /**
      * Last used session.
      *
      * @var HttpSession|null
      */
-    private ?HttpSession $lastUsedSession = null;
+    private $lastUsedSession;
 
     /**
      * Token validator for OAuth access tokens.
+     * @var \Mcp\Server\Auth\TokenValidatorInterface|null
      */
-    private ?TokenValidatorInterface $validator = null;
+    private $validator;
     
     /**
      * Constructor.
@@ -285,16 +286,23 @@ class HttpServerTransport implements Transport
         $this->lastUsedSession = $session;
 
         
-        // Process request based on HTTP method
-        $response = match (strtoupper($request->getMethod())) {
-            'POST' => $this->handlePostRequest($request, $session),
-            'GET' => $this->handleGetRequest($request, $session),
-            'DELETE' => $this->handleDeleteRequest($request, $session),
-            default => HttpMessage::createJsonResponse(
-                ['error' => 'Method not allowed'],
-                405
-            )->setHeader('Allow', 'GET, POST, DELETE')
-        };
+        switch (strtoupper($request->getMethod())) {
+            case 'POST':
+                $response = $this->handlePostRequest($request, $session);
+                break;
+            case 'GET':
+                $response = $this->handleGetRequest($request, $session);
+                break;
+            case 'DELETE':
+                $response = $this->handleDeleteRequest($request, $session);
+                break;
+            default:
+                $response = HttpMessage::createJsonResponse(
+                    ['error' => 'Method not allowed'],
+                    405
+                )->setHeader('Allow', 'GET, POST, DELETE');
+                break;
+        }
         
         // Add session ID header to response if we have a session
         if ($session !== null) {
@@ -571,10 +579,10 @@ class HttpServerTransport implements Transport
         $params = isset($data['params']) ? $this->createRequestParams($data['params']) : null;
         
         $request = new JSONRPCRequest(
-            jsonrpc: '2.0',
-            id: $id,
-            method: $method,
-            params: $params
+            '2.0',
+            $id,
+            $params,
+            $method
         );
         
         return new JsonRpcMessage($request);
@@ -594,9 +602,9 @@ class HttpServerTransport implements Transport
         $params = isset($data['params']) ? $this->createNotificationParams($data['params']) : null;
         
         $notification = new JSONRPCNotification(
-            jsonrpc: '2.0',
-            method: $method,
-            params: $params
+            '2.0',
+            $params,
+            $method
         );
         
         return new JsonRpcMessage($notification);
@@ -631,9 +639,9 @@ class HttpServerTransport implements Transport
         }
         
         $response = new JSONRPCResponse(
-            jsonrpc: '2.0',
-            id: $id,
-            result: $resultObj
+            '2.0',
+            $id,
+            $resultObj
         );
         
         return new JsonRpcMessage($response);
@@ -651,15 +659,15 @@ class HttpServerTransport implements Transport
         $error = $data['error'];
         
         $errorObj = new JsonRpcErrorObject(
-            code: $error['code'],
-            message: $error['message'],
-            data: $error['data'] ?? null
+            $error['code'],
+            $error['message'],
+            $error['data'] ?? null
         );
         
         $errorResponse = new JSONRPCError(
-            jsonrpc: '2.0',
-            id: $id,
-            error: $errorObj
+            '2.0',
+            $id,
+            $errorObj
         );
         
         return new JsonRpcMessage($errorResponse);

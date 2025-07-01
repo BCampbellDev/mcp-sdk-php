@@ -37,12 +37,27 @@ namespace Mcp\Types;
  * }
  */
 class PromptMessage implements McpModel {
+    /**
+     * @readonly
+     * @var \Mcp\Types\Role
+     */
+    public $role;
+    /**
+     * @readonly
+     * @var \Mcp\Types\TextContent|\Mcp\Types\ImageContent|\Mcp\Types\AudioContent|\Mcp\Types\EmbeddedResource
+     */
+    public $content;
     use ExtraFieldsTrait;
 
-    public function __construct(
-        public readonly Role $role,
-        public readonly TextContent|ImageContent|AudioContent|EmbeddedResource $content,
-    ) {}
+    /**
+     * @param \Mcp\Types\TextContent|\Mcp\Types\ImageContent|\Mcp\Types\AudioContent|\Mcp\Types\EmbeddedResource $content
+     * @param \Mcp\Types\Role::* $role
+     */
+    public function __construct($role, $content)
+    {
+        $this->role = $role;
+        $this->content = $content;
+    }
 
     public static function fromArray(array $data): self {
         $roleStr = $data['role'] ?? '';
@@ -60,13 +75,22 @@ class PromptMessage implements McpModel {
         }
 
         $contentType = $contentData['type'];
-        $content = match($contentType) {
-            'text' => TextContent::fromArray($contentData),
-            'image' => ImageContent::fromArray($contentData),
-            'audio' => AudioContent::fromArray($contentData),
-            'resource' => EmbeddedResource::fromArray($contentData),
-            default => throw new \InvalidArgumentException("Unknown content type: $contentType")
-        };
+        switch ($contentType) {
+            case 'text':
+                $content = TextContent::fromArray($contentData);
+                break;
+            case 'image':
+                $content = ImageContent::fromArray($contentData);
+                break;
+            case 'audio':
+                $content = AudioContent::fromArray($contentData);
+                break;
+            case 'resource':
+                $content = EmbeddedResource::fromArray($contentData);
+                break;
+            default:
+                throw new \InvalidArgumentException("Unknown content type: $contentType");
+        }
 
         $obj = new self($role, $content);
 
@@ -82,7 +106,10 @@ class PromptMessage implements McpModel {
         $this->content->validate();
     }
 
-    public function jsonSerialize(): mixed {
+    /**
+     * @return mixed
+     */
+    public function jsonSerialize() {
         return array_merge([
             'role' => $this->role->value,
             'content' => $this->content,

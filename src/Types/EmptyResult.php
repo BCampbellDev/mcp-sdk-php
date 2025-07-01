@@ -36,8 +36,9 @@ class EmptyResult extends Result
 {
     /**
      * Construct from server response data.
+     * @return static
      */
-    public static function fromResponseData(array $data): static
+    public static function fromResponseData(array $data)
     {
         // If the server might return _meta, handle it:
         $meta = null;

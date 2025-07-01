@@ -37,14 +37,33 @@ namespace Mcp\Types;
  * }
  */
 class ProgressNotificationParams implements McpModel {
+    /**
+     * @readonly
+     * @var \Mcp\Types\ProgressToken
+     */
+    public $progressToken;
+    /**
+     * @readonly
+     * @var float
+     */
+    public $progress;
+    /**
+     * @var float|null
+     */
+    public $total;
+    /**
+     * @var string|null
+     */
+    public $message;
     use ExtraFieldsTrait;
 
-    public function __construct(
-        public readonly ProgressToken $progressToken,
-        public readonly float $progress,
-        public ?float $total = null,
-        public ?string $message = null
-    ) {}
+    public function __construct(ProgressToken $progressToken, float $progress, ?float $total = null, ?string $message = null)
+    {
+        $this->progressToken = $progressToken;
+        $this->progress = $progress;
+        $this->total = $total;
+        $this->message = $message;
+    }
 
     public function validate(): void {
         $this->progressToken->validate();
@@ -53,7 +72,10 @@ class ProgressNotificationParams implements McpModel {
         }
     }
 
-    public function jsonSerialize(): mixed {
+    /**
+     * @return mixed
+     */
+    public function jsonSerialize() {
         $data = [
             'progressToken' => $this->progressToken,
             'progress' => $this->progress,

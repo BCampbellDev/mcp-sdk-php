@@ -46,13 +46,32 @@ use InvalidArgumentException;
  * We use ExtraFieldsTrait to allow arbitrary additional fields if needed.
  */
 class ErrorData implements McpModel {
+    /**
+     * @readonly
+     * @var int
+     */
+    public $code;
+    /**
+     * @readonly
+     * @var string
+     */
+    public $message;
+    /**
+     * @readonly
+     * @var mixed
+     */
+    public $data = null;
     use ExtraFieldsTrait;
 
-    public function __construct(
-        public readonly int $code,
-        public readonly string $message,
-        public readonly mixed $data = null,
-    ) {}
+    /**
+     * @param mixed $data
+     */
+    public function __construct(int $code, string $message, $data = null)
+    {
+        $this->code = $code;
+        $this->message = $message;
+        $this->data = $data;
+    }
 
     public function validate(): void {
         if (empty($this->message)) {
@@ -60,7 +79,10 @@ class ErrorData implements McpModel {
         }
     }
 
-    public function jsonSerialize(): mixed {
+    /**
+     * @return mixed
+     */
+    public function jsonSerialize() {
         $data = [
             'code' => $this->code,
             'message' => $this->message,

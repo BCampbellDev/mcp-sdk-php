@@ -39,7 +39,10 @@ namespace Mcp\Types;
 class ServerRequest implements McpModel {
     use ExtraFieldsTrait;
 
-    private Request $request;
+    /**
+     * @var \Mcp\Types\Request
+     */
+    private $request;
 
     public function __construct(Request $request) {
         if (!(
@@ -62,12 +65,16 @@ class ServerRequest implements McpModel {
     public static function fromMethodAndParams(string $method, ?array $params): self {
         $params = $params ?? [];
 
-        return match ($method) {
-            'ping' => new self(new PingRequest()),
-            'sampling/createMessage' => self::createCreateMessageRequest($params),
-            'roots/list' => new self(new ListRootsRequest()),
-            default => throw new \InvalidArgumentException("Unknown server request method: $method")
-        };
+        switch ($method) {
+            case 'ping':
+                return new self(new PingRequest());
+            case 'sampling/createMessage':
+                return self::createCreateMessageRequest($params);
+            case 'roots/list':
+                return new self(new ListRootsRequest());
+            default:
+                throw new \InvalidArgumentException("Unknown server request method: $method");
+        }
     }
 
     private static function createCreateMessageRequest(array $params): self {
@@ -123,14 +130,14 @@ class ServerRequest implements McpModel {
         $includeContext = $params['includeContext'] ?? null;
 
         return new self(new CreateMessageRequest(
-            messages: $messages,
-            maxTokens: $maxTokens,
-            stopSequences: $stopSequences,
-            systemPrompt: $systemPrompt,
-            temperature: $temperature,
-            metadata: $metadata,
-            modelPreferences: $modelPreferences,
-            includeContext: $includeContext
+            $messages,
+            $maxTokens,
+            $stopSequences,
+            $systemPrompt,
+            $temperature,
+            $metadata,
+            $modelPreferences,
+            $includeContext
         ));
     }
 
@@ -144,19 +151,25 @@ class ServerRequest implements McpModel {
         }
 
         $content = self::createSamplingContent($m['content']);
-        return new SamplingMessage(role: $m['role'], content: $content);
+        return new SamplingMessage($m['role'], $content);
     }
 
-    private static function createSamplingContent(array $c): TextContent|ImageContent {
+    /**
+     * @return \Mcp\Types\TextContent|\Mcp\Types\ImageContent
+     */
+    private static function createSamplingContent(array $c) {
         if (!isset($c['type'])) {
             throw new \InvalidArgumentException('SamplingMessage content requires a type');
         }
 
-        return match ($c['type']) {
-            'text' => self::createTextContent($c),
-            'image' => self::createImageContent($c),
-            default => throw new \InvalidArgumentException("Unknown content type: {$c['type']}")
-        };
+        switch ($c['type']) {
+            case 'text':
+                return self::createTextContent($c);
+            case 'image':
+                return self::createImageContent($c);
+            default:
+                throw new \InvalidArgumentException("Unknown content type: {$c['type']}");
+        }
     }
 
     private static function createTextContent(array $c): TextContent {
@@ -180,7 +193,7 @@ class ServerRequest implements McpModel {
         if (!isset($c['data']) || !isset($c['mimeType'])) {
             throw new \InvalidArgumentException('ImageContent requires data and mimeType');
         }
-        $imageContent = new ImageContent(data: $c['data'], mimeType: $c['mimeType']);
+        $imageContent = new ImageContent($c['data'], $c['mimeType']);
 
         // Extra fields
         foreach ($c as $k => $v) {
@@ -194,15 +207,15 @@ class ServerRequest implements McpModel {
 
     private static function createModelPreferences(array $mp): ModelPreferences {
         $modelPreferences = new ModelPreferences(
-            costPriority: $mp['costPriority'] ?? null,
-            speedPriority: $mp['speedPriority'] ?? null,
-            intelligencePriority: $mp['intelligencePriority'] ?? null
+            $mp['costPriority'] ?? null,
+            $mp['speedPriority'] ?? null,
+            $mp['intelligencePriority'] ?? null
         );
 
         if (isset($mp['hints']) && is_array($mp['hints'])) {
             foreach ($mp['hints'] as $hintData) {
                 $modelHint = new ModelHint(
-                    name: $hintData['name'] ?? null
+                    $hintData['name'] ?? null
                 );
                 $modelPreferences->addHint($modelHint);
             }
@@ -226,7 +239,10 @@ class ServerRequest implements McpModel {
         return $this->request;
     }
 
-    public function jsonSerialize(): mixed {
+    /**
+     * @return mixed
+     */
+    public function jsonSerialize() {
         $data = $this->request->jsonSerialize();
         return array_merge((array)$data, $this->extraFields);
     }

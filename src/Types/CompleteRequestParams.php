@@ -38,11 +38,26 @@ namespace Mcp\Types;
  */
 class CompleteRequestParams extends RequestParams
 {
+    /**
+     * @readonly
+     * @var \Mcp\Types\CompletionArgument
+     */
+    public $argument;
+    /**
+     * @readonly
+     * @var \Mcp\Types\PromptReference|\Mcp\Types\ResourceReference
+     */
+    public $ref;
+    /**
+     * @param \Mcp\Types\PromptReference|\Mcp\Types\ResourceReference $ref
+     */
     public function __construct(
-        public readonly CompletionArgument $argument,
-        public readonly PromptReference|ResourceReference $ref,
+        CompletionArgument $argument,
+        $ref,
         ?Meta $_meta = null
     ) {
+        $this->argument = $argument;
+        $this->ref = $ref;
         parent::__construct($_meta);
     }
 
@@ -57,7 +72,10 @@ class CompleteRequestParams extends RequestParams
         $this->ref->validate();
     }
 
-    public function jsonSerialize(): mixed
+    /**
+     * @return mixed
+     */
+    public function jsonSerialize()
     {
         $data = [
             'argument' => $this->argument,

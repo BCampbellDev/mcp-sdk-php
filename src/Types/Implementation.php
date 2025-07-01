@@ -33,12 +33,23 @@ namespace Mcp\Types;
  * Describes the name and version of an MCP implementation
  */
 class Implementation implements McpModel {
+    /**
+     * @readonly
+     * @var string
+     */
+    public $name;
+    /**
+     * @readonly
+     * @var string
+     */
+    public $version;
     use ExtraFieldsTrait;
 
-    public function __construct(
-        public readonly string $name,
-        public readonly string $version,
-    ) {}
+    public function __construct(string $name, string $version)
+    {
+        $this->name = $name;
+        $this->version = $version;
+    }
 
     public static function fromArray(array $data): self {
         // Extract required fields
@@ -71,7 +82,10 @@ class Implementation implements McpModel {
         }
     }
 
-    public function jsonSerialize(): mixed {
+    /**
+     * @return mixed
+     */
+    public function jsonSerialize() {
         $data = get_object_vars($this);
         return array_merge($data, $this->extraFields);
     }

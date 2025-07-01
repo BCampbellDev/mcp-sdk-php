@@ -31,13 +31,24 @@ namespace Mcp\Types;
 
 class GetPromptResult extends Result {
     /**
+     * @var PromptMessage[]
+     * @readonly
+     */
+    public $messages;
+    /**
+     * @var string|null
+     */
+    public $description;
+    /**
      * @param PromptMessage[] $messages
      */
     public function __construct(
-        public readonly array $messages,
-        public ?string $description = null,
-        ?Meta $_meta = null,
+        array $messages,
+        ?string $description = null,
+        ?Meta $_meta = null
     ) {
+        $this->messages = $messages;
+        $this->description = $description;
         parent::__construct($_meta);
     }
 
@@ -86,7 +97,10 @@ class GetPromptResult extends Result {
         }
     }
 
-    public function jsonSerialize(): mixed {
+    /**
+     * @return mixed
+     */
+    public function jsonSerialize() {
         $data = parent::jsonSerialize();
         $data['messages'] = $this->messages;
         if ($this->description !== null) {

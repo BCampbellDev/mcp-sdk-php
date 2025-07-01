@@ -38,13 +38,30 @@ namespace Mcp\Types;
  * }
  */
 class JSONRPCResponse implements McpModel {
+    /**
+     * @readonly
+     * @var string
+     */
+    public $jsonrpc;
+    /**
+     * @var \Mcp\Types\RequestId
+     */
+    public $id;
+    /**
+     * @var mixed
+     */
+    public $result;
     use ExtraFieldsTrait;
 
-    public function __construct(
-        public readonly string $jsonrpc,
-        public RequestId $id,
-        public mixed $result,
-    ) {}
+    /**
+     * @param mixed $result
+     */
+    public function __construct(string $jsonrpc, RequestId $id, $result)
+    {
+        $this->jsonrpc = $jsonrpc;
+        $this->id = $id;
+        $this->result = $result;
+    }
 
     public function validate(): void {
         if ($this->jsonrpc !== '2.0') {
@@ -54,7 +71,10 @@ class JSONRPCResponse implements McpModel {
         $this->result->validate();
     }
 
-    public function jsonSerialize(): mixed {
+    /**
+     * @return mixed
+     */
+    public function jsonSerialize() {
         $data = [
             'jsonrpc' => $this->jsonrpc,
             'id' => $this->id,

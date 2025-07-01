@@ -32,7 +32,10 @@ namespace Mcp\Client\Transport;
  * Gets default environment variables that are safe to inherit
  */
 class EnvironmentHelper {
-    private static array $defaultInheritedEnvVars;
+    /**
+     * @var mixed[]
+     */
+    private static $defaultInheritedEnvVars;
 
     public static function initialize(): void {
         self::$defaultInheritedEnvVars = PHP_OS_FAMILY === 'Windows' 
@@ -68,7 +71,7 @@ class EnvironmentHelper {
                 continue;
             }
 
-            if (str_starts_with($value, '()')) {
+            if (strncmp($value, '()', strlen('()')) === 0) {
                 // Skip functions, which are a security risk
                 continue;
             }

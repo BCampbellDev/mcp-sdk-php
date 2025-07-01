@@ -51,16 +51,16 @@ use InvalidArgumentException;
  */
 class Client {
     /** @var ClientSession|null */
-    private ?ClientSession $session = null;
+    private $session;
 
     /** @var StdioTransport|StreamableHttpTransport|null */
     private $transport = null;
 
     /** @var LoggerInterface */
-    private LoggerInterface $logger;
+    private $logger;
 
     /** @var bool */
-    private bool $isRunning = false;
+    private $isRunning = false;
 
     /**
      * Client constructor.
@@ -108,24 +108,24 @@ class Client {
                 
                 // Create HTTP configuration
                 $httpConfig = new HttpConfiguration(
-                    endpoint: $commandOrUrl,
-                    headers: $headers,
-                    connectionTimeout: $httpOptions['connectionTimeout'] ?? 30.0,
-                    readTimeout: $httpOptions['readTimeout'] ?? 60.0,
-                    sseIdleTimeout: $httpOptions['sseIdleTimeout'] ?? 300.0,
-                    enableSse: $httpOptions['enableSse'] ?? true,
-                    maxRetries: $httpOptions['maxRetries'] ?? 3,
-                    retryDelay: $httpOptions['retryDelay'] ?? 0.5,
-                    verifyTls: $httpOptions['verifyTls'] ?? true,
-                    caFile: $httpOptions['caFile'] ?? null,
-                    curlOptions: $httpOptions['curlOptions'] ?? []
+                    $commandOrUrl,
+                    $headers,
+                    $httpOptions['connectionTimeout'] ?? 30.0,
+                    $httpOptions['readTimeout'] ?? 60.0,
+                    $httpOptions['sseIdleTimeout'] ?? 300.0,
+                    $httpOptions['enableSse'] ?? true,
+                    $httpOptions['maxRetries'] ?? 3,
+                    $httpOptions['retryDelay'] ?? 0.5,
+                    $httpOptions['verifyTls'] ?? true,
+                    $httpOptions['caFile'] ?? null,
+                    $httpOptions['curlOptions'] ?? []
                 );
                 
                 // Create the HTTP transport
                 $transport = new StreamableHttpTransport(
-                    config: $httpConfig,
-                    autoSse: $httpOptions['autoSse'] ?? true,
-                    logger: $this->logger
+                    $httpConfig,
+                    $httpOptions['autoSse'] ?? true,
+                    $this->logger
                 );
                 
                 $this->transport = $transport;
@@ -142,10 +142,10 @@ class Client {
 
             // Initialize the client session with the obtained streams
             $this->session = new ClientSession(
-                readStream: $readStream,
-                writeStream: $writeStream,
-                readTimeout: $readTimeout,
-                logger: $this->logger
+                $readStream,
+                $writeStream,
+                $readTimeout,
+                $this->logger
             );
 
             // Initialize the session (e.g., perform handshake if necessary)

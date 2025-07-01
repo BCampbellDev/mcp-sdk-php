@@ -46,7 +46,10 @@ namespace Mcp\Types;
 class ServerNotification implements McpModel {
     use ExtraFieldsTrait;
 
-    private Notification $notification;
+    /**
+     * @var \Mcp\Types\Notification
+     */
+    private $notification;
 
     public function __construct(Notification $notification) {
         if (!(
@@ -72,16 +75,24 @@ class ServerNotification implements McpModel {
     public static function fromMethodAndParams(string $method, ?array $params): self {
         $params = $params ?? [];
 
-        return match ($method) {
-            'notifications/cancelled' => self::createCancelledNotification($params),
-            'notifications/progress' => self::createProgressNotification($params),
-            'notifications/resources/list_changed' => self::createResourceListChangedNotification($params),
-            'notifications/resources/updated' => self::createResourceUpdatedNotification($params),
-            'notifications/prompts/list_changed' => self::createPromptListChangedNotification($params),
-            'notifications/tools/list_changed' => self::createToolListChangedNotification($params),
-            'notifications/message' => self::createLoggingMessageNotification($params),
-            default => throw new \InvalidArgumentException("Unknown server notification method: $method")
-        };
+        switch ($method) {
+            case 'notifications/cancelled':
+                return self::createCancelledNotification($params);
+            case 'notifications/progress':
+                return self::createProgressNotification($params);
+            case 'notifications/resources/list_changed':
+                return self::createResourceListChangedNotification($params);
+            case 'notifications/resources/updated':
+                return self::createResourceUpdatedNotification($params);
+            case 'notifications/prompts/list_changed':
+                return self::createPromptListChangedNotification($params);
+            case 'notifications/tools/list_changed':
+                return self::createToolListChangedNotification($params);
+            case 'notifications/message':
+                return self::createLoggingMessageNotification($params);
+            default:
+                throw new \InvalidArgumentException("Unknown server notification method: $method");
+        }
     }
 
     private static function createCancelledNotification(array $params): self {
@@ -116,9 +127,9 @@ class ServerNotification implements McpModel {
         $total = isset($params['total']) ? (float)$params['total'] : null;
 
         $progressParams = new ProgressNotificationParams(
-            progressToken: $progressToken,
-            progress: $progress,
-            total: $total
+            $progressToken,
+            $progress,
+            $total
         );
 
         // Extra fields
@@ -190,9 +201,9 @@ class ServerNotification implements McpModel {
         $logger = $params['logger'] ?? null;
 
         $loggingParams = new LoggingMessageNotificationParams(
-            level: $level,
-            data: $data,
-            logger: $logger
+            $level,
+            $data,
+            $logger
         );
 
         // Extra fields not level/data/logger
@@ -213,7 +224,10 @@ class ServerNotification implements McpModel {
         return $this->notification;
     }
 
-    public function jsonSerialize(): mixed {
+    /**
+     * @return mixed
+     */
+    public function jsonSerialize() {
         $data = $this->notification->jsonSerialize();
         return array_merge((array)$data, $this->extraFields);
     }

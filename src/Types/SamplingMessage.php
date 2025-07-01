@@ -36,18 +36,36 @@ namespace Mcp\Types;
  * }
  */
 class SamplingMessage implements McpModel {
+    /**
+     * @readonly
+     * @var \Mcp\Types\Role
+     */
+    public $role;
+    /**
+     * @readonly
+     * @var \Mcp\Types\TextContent|\Mcp\Types\ImageContent
+     */
+    public $content;
     use ExtraFieldsTrait;
 
-    public function __construct(
-        public readonly Role $role,
-        public readonly TextContent|ImageContent $content,
-    ) {}
+    /**
+     * @param \Mcp\Types\TextContent|\Mcp\Types\ImageContent $content
+     * @param \Mcp\Types\Role::* $role
+     */
+    public function __construct($role, $content)
+    {
+        $this->role = $role;
+        $this->content = $content;
+    }
 
     public function validate(): void {
         $this->content->validate();
     }
 
-    public function jsonSerialize(): mixed {
+    /**
+     * @return mixed
+     */
+    public function jsonSerialize() {
         return array_merge([
             'role' => $this->role->value,
             'content' => $this->content,

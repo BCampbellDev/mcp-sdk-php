@@ -50,7 +50,10 @@ class ServerLoggingCapability implements McpModel {
         // No mandatory fields, arbitrary fields allowed.
     }
 
-    public function jsonSerialize(): mixed {
+    /**
+     * @return mixed
+     */
+    public function jsonSerialize() {
         return empty($this->extraFields) ? new \stdClass() : $this->extraFields; // No defined properties
     }
 }

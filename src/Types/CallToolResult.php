@@ -36,13 +36,24 @@ namespace Mcp\Types;
  */
 class CallToolResult extends Result {
     /**
+     * @var (TextContent|ImageContent|AudioContent|EmbeddedResource)[]
+     * @readonly
+     */
+    public $content;
+    /**
+     * @var bool|null
+     */
+    public $isError = false;
+    /**
      * @param (TextContent|ImageContent|AudioContent|EmbeddedResource)[] $content
      */
     public function __construct(
-        public readonly array $content,
-        public ?bool $isError = false,
-        ?Meta $_meta = null,
+        array $content,
+        ?bool $isError = false,
+        ?Meta $_meta = null
     ) {
+        $this->content = $content;
+        $this->isError = $isError;
         parent::__construct($_meta);
     }
 
@@ -69,13 +80,22 @@ class CallToolResult extends Result {
             }
 
             $type = $item['type'];
-            $content[] = match($type) {
-                'text' => TextContent::fromArray($item),
-                'image' => ImageContent::fromArray($item),
-                'audio' => AudioContent::fromArray($item),
-                'resource' => EmbeddedResource::fromArray($item),
-                default => throw new \InvalidArgumentException("Unknown content type: $type in CallToolResult")
-            };
+            switch ($type) {
+                case 'text':
+                    $content[] = TextContent::fromArray($item);
+                    break;
+                case 'image':
+                    $content[] = ImageContent::fromArray($item);
+                    break;
+                case 'audio':
+                    $content[] = AudioContent::fromArray($item);
+                    break;
+                case 'resource':
+                    $content[] = EmbeddedResource::fromArray($item);
+                    break;
+                default:
+                    throw new \InvalidArgumentException("Unknown content type: $type in CallToolResult");
+            }
         }
 
         $obj = new self($content, (bool)$isError, $meta);

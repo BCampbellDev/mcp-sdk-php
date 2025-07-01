@@ -30,14 +30,33 @@ declare(strict_types=1);
 namespace Mcp\Types;
 
 class Tool implements McpModel {
+    /**
+     * @readonly
+     * @var string
+     */
+    public $name;
+    /**
+     * @readonly
+     * @var \Mcp\Types\ToolInputSchema
+     */
+    public $inputSchema;
+    /**
+     * @var string|null
+     */
+    public $description;
+    /**
+     * @var \Mcp\Types\ToolAnnotations|null
+     */
+    public $annotations;
     use ExtraFieldsTrait;
 
-    public function __construct(
-        public readonly string $name,
-        public readonly ToolInputSchema $inputSchema,
-        public ?string $description = null,
-        public ?ToolAnnotations $annotations = null,
-    ) {}
+    public function __construct(string $name, ToolInputSchema $inputSchema, ?string $description = null, ?ToolAnnotations $annotations = null)
+    {
+        $this->name = $name;
+        $this->inputSchema = $inputSchema;
+        $this->description = $description;
+        $this->annotations = $annotations;
+    }
 
     public static function fromArray(array $data): self {
         $name = $data['name'] ?? '';
@@ -76,7 +95,10 @@ class Tool implements McpModel {
         $this->inputSchema->validate();
     }
 
-    public function jsonSerialize(): mixed {
+    /**
+     * @return mixed
+     */
+    public function jsonSerialize() {
         $data = [
             'name' => $this->name,
             'inputSchema' => $this->inputSchema,

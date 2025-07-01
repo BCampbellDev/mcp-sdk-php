@@ -36,13 +36,24 @@ namespace Mcp\Types;
  * }
  */
 class GetPromptRequestParams extends RequestParams {
+    /**
+     * @readonly
+     * @var string
+     */
+    public $name;
+    /**
+     * @var \Mcp\Types\PromptArguments|null
+     */
+    public $arguments;
     use ExtraFieldsTrait;
 
     public function __construct(
-        public readonly string $name,
-        public ?PromptArguments $arguments = null,
-        ?Meta $_meta = null,
+        string $name,
+        ?PromptArguments $arguments = null,
+        ?Meta $_meta = null
     ) {
+        $this->name = $name;
+        $this->arguments = $arguments;
         parent::__construct($_meta);
     }
 
@@ -57,7 +68,10 @@ class GetPromptRequestParams extends RequestParams {
         }
     }
 
-    public function jsonSerialize(): mixed {
+    /**
+     * @return mixed
+     */
+    public function jsonSerialize() {
         $data = [
             'name' => $this->name,
             // Return an empty object if arguments are null or empty

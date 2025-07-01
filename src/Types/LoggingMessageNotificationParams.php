@@ -37,13 +37,32 @@ namespace Mcp\Types;
  * }
  */
 class LoggingMessageNotificationParams implements McpModel {
+    /**
+     * @readonly
+     * @var \Mcp\Types\LoggingLevel
+     */
+    public $level;
+    /**
+     * @readonly
+     * @var mixed
+     */
+    public $data;
+    /**
+     * @var string|null
+     */
+    public $logger;
     use ExtraFieldsTrait;
 
-    public function __construct(
-        public readonly LoggingLevel $level,
-        public readonly mixed $data,
-        public ?string $logger = null,
-    ) {}
+    /**
+     * @param mixed $data
+     * @param \Mcp\Types\LoggingLevel::* $level
+     */
+    public function __construct($level, $data, ?string $logger = null)
+    {
+        $this->level = $level;
+        $this->data = $data;
+        $this->logger = $logger;
+    }
 
     public function validate(): void {
         if ($this->data === null) {
@@ -51,7 +70,10 @@ class LoggingMessageNotificationParams implements McpModel {
         }
     }
 
-    public function jsonSerialize(): mixed {
+    /**
+     * @return mixed
+     */
+    public function jsonSerialize() {
         $data = [
             'level' => $this->level->value,
             'data' => $this->data,

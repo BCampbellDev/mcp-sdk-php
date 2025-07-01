@@ -33,11 +33,23 @@ namespace Mcp\Types;
  * Audio content for messages
  */
 class AudioContent extends Content {
+    /**
+     * @readonly
+     * @var string
+     */
+    public $data;
+    /**
+     * @readonly
+     * @var string
+     */
+    public $mimeType;
     public function __construct(
-        public readonly string $data,
-        public readonly string $mimeType,
-        ?Annotations $annotations = null,
+        string $data,
+        string $mimeType,
+        ?Annotations $annotations = null
     ) {
+        $this->data = $data;
+        $this->mimeType = $mimeType;
         parent::__construct('audio', $annotations);
     }
 
@@ -70,7 +82,10 @@ class AudioContent extends Content {
         }
     }
 
-    public function jsonSerialize(): mixed {
+    /**
+     * @return mixed
+     */
+    public function jsonSerialize() {
         $data = parent::jsonSerialize();
         $data['data'] = $this->data;
         $data['mimeType'] = $this->mimeType;

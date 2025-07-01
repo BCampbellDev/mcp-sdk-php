@@ -41,6 +41,10 @@
   */
  class HttpSessionManager {
      /**
+      * @var LoggerInterface|null
+      */
+     private $logger;
+     /**
       * The MCP session ID header name
       */
      private const SESSION_HEADER = 'Mcp-Session-Id';
@@ -52,30 +56,36 @@
      
      /**
       * The session ID received from the server during initialization
+      * @var string|null
       */
-     private ?string $sessionId = null;
+     private $sessionId;
      
      /**
       * The ID of the last SSE event received
+      * @var string|null
       */
-     private ?string $lastEventId = null;
+     private $lastEventId;
      
      /**
       * Whether the session has been initialized
+      * @var bool
       */
-     private bool $initialized = false;
+     private $initialized = false;
      
      /**
       * Whether the session has been invalidated (e.g., by receiving a 404)
+      * @var bool
       */
-     private bool $invalidated = false;
+     private $invalidated = false;
  
      /**
       * @param LoggerInterface|null $logger PSR-3 compatible logger
       */
-     public function __construct(
-         private LoggerInterface $logger = new NullLogger()
-     ) {}
+     public function __construct(?LoggerInterface $logger = null)
+     {
+         $logger = $logger ?? new NullLogger();
+         $this->logger = $logger;
+     }
  
      /**
       * Get HTTP headers that should be included in all requests.

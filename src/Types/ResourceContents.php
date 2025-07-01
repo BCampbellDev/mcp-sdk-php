@@ -32,12 +32,22 @@ namespace Mcp\Types;
  * Base class for resource contents
  */
 abstract class ResourceContents implements McpModel {
+    /**
+     * @readonly
+     * @var string
+     */
+    public $uri;
+    /**
+     * @var string|null
+     */
+    public $mimeType;
     use ExtraFieldsTrait;
 
-    public function __construct(
-        public readonly string $uri,
-        public ?string $mimeType = null,
-    ) {}
+    public function __construct(string $uri, ?string $mimeType = null)
+    {
+        $this->uri = $uri;
+        $this->mimeType = $mimeType;
+    }
 
     public function validate(): void {
         if (empty($this->uri)) {
@@ -46,7 +56,10 @@ abstract class ResourceContents implements McpModel {
         // mimeType is optional
     }
 
-    public function jsonSerialize(): mixed {
+    /**
+     * @return mixed
+     */
+    public function jsonSerialize() {
         $data = get_object_vars($this);
         return array_merge($data, $this->extraFields);
     }

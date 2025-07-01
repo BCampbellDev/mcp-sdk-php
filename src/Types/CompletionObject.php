@@ -39,16 +39,30 @@ namespace Mcp\Types;
  * }
  */
 class CompletionObject implements McpModel {
+    /**
+     * @var string[]
+     * @readonly
+     */
+    public $values;
+    /**
+     * @var int|null
+     */
+    public $total;
+    /**
+     * @var bool|null
+     */
+    public $hasMore;
     use ExtraFieldsTrait;
 
     /**
      * @param string[] $values
      */
-    public function __construct(
-        public readonly array $values,
-        public ?int $total = null,
-        public ?bool $hasMore = null,
-    ) {}
+    public function __construct(array $values, ?int $total = null, ?bool $hasMore = null)
+    {
+        $this->values = $values;
+        $this->total = $total;
+        $this->hasMore = $hasMore;
+    }
 
     public static function fromArray(array $data): self {
         $values = $data['values'] ?? [];
@@ -58,9 +72,9 @@ class CompletionObject implements McpModel {
         unset($data['values'], $data['total'], $data['hasMore']);
 
         $obj = new self(
-            values: $values,
-            total: $total !== null ? (int)$total : null,
-            hasMore: $hasMore !== null ? (bool)$hasMore : null
+            $values,
+            $total !== null ? (int)$total : null,
+            $hasMore !== null ? (bool)$hasMore : null
         );
 
         foreach ($data as $k => $v) {
@@ -77,7 +91,10 @@ class CompletionObject implements McpModel {
         }
     }
 
-    public function jsonSerialize(): mixed {
+    /**
+     * @return mixed
+     */
+    public function jsonSerialize() {
         $data = ['values' => $this->values];
         if ($this->total !== null) {
             $data['total'] = $this->total;

@@ -38,13 +38,32 @@ use Mcp\Types\ProgressToken;
  * Tracks current progress and sends progress notifications via the session.
  */
 class ProgressContext {
-    private float $current = 0.0;
+    /**
+     * @readonly
+     * @var \Mcp\Shared\BaseSession
+     */
+    private $session;
+    /**
+     * @readonly
+     * @var \Mcp\Types\ProgressToken
+     */
+    private $progressToken;
+    /**
+     * @readonly
+     * @var float|null
+     */
+    private $total;
+    /**
+     * @var float
+     */
+    private $current = 0.0;
 
-    public function __construct(
-        private readonly BaseSession $session,
-        private readonly ProgressToken $progressToken,
-        private readonly ?float $total = null,
-    ) {}
+    public function __construct(BaseSession $session, ProgressToken $progressToken, ?float $total = null)
+    {
+        $this->session = $session;
+        $this->progressToken = $progressToken;
+        $this->total = $total;
+    }
 
     /**
      * Increments the current progress by the given amount and sends a progress notification.

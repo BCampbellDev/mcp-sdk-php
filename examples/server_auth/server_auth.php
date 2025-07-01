@@ -92,13 +92,13 @@ $server = new Server('mcp-example-auth-server');
 // Register prompt handlers
 $server->registerHandler('prompts/list', function($params) {
     $prompt = new Prompt(
-        name: 'example-prompt',
-        description: 'An example prompt template',
-        arguments: [
+        'example-prompt',
+        'An example prompt template',
+        [
             new PromptArgument(
-                name: 'arg1',
-                description: 'Example argument',
-                required: true
+                'arg1',
+                'Example argument',
+                true
             )
         ]
     );
@@ -116,15 +116,15 @@ $server->registerHandler('prompts/get', function($params) {
     $argValue = $arguments->arg1 ?? 'none';
     
     return new GetPromptResult(
-        messages: [
+        [
             new PromptMessage(
-                role: Role::USER,
-                content: new TextContent(
-                    text: "Example prompt text with argument: $argValue"
+                Role::USER,
+                new TextContent(
+                    "Example prompt text with argument: $argValue"
                 )
             )
         ],
-        description: 'Example prompt'
+        'Example prompt'
     );
 });
 
@@ -144,15 +144,15 @@ $server->registerHandler('tools/list', function($params) {
 
     // Create schema with properties and required fields
     $inputSchema = new ToolInputSchema(
-        properties: $properties,
-        required: ['num1', 'num2']
+        $properties,
+        ['num1', 'num2']
     );
 
     // Create calculator tool
     $calculator = new Tool(
-        name: 'add-numbers',
-        description: 'Adds two numbers together',
-        inputSchema: $inputSchema
+        'add-numbers',
+        $inputSchema,
+        'Adds two numbers together'
     );
     
     // Create a second tool for testing
@@ -164,14 +164,14 @@ $server->registerHandler('tools/list', function($params) {
     ]);
     
     $inputSchema2 = new ToolInputSchema(
-        properties: $properties2,
-        required: ['text']
+        $properties2,
+        ['text']
     );
     
     $textTool = new Tool(
-        name: 'uppercase',
-        description: 'Converts text to uppercase',
-        inputSchema: $inputSchema2
+        'uppercase',
+        $inputSchema2,
+        'Converts text to uppercase'
     );
 
     return new ListToolsResult([$calculator, $textTool]);
@@ -189,17 +189,17 @@ $server->registerHandler('tools/call', function($params) {
 
             if ($num1 === false || $num2 === false) {
                 return new CallToolResult(
-                    content: [new TextContent(
-                        text: "Error: Both arguments must be valid numbers"
+                    [new TextContent(
+                        "Error: Both arguments must be valid numbers"
                     )],
-                    isError: true
+                    true
                 );
             }
 
             $sum = $num1 + $num2;
             return new CallToolResult(
-                content: [new TextContent(
-                    text: "The sum of {$num1} and {$num2} is {$sum}"
+                [new TextContent(
+                    "The sum of {$num1} and {$num2} is {$sum}"
                 )]
             );
             
@@ -207,16 +207,16 @@ $server->registerHandler('tools/call', function($params) {
             $text = $arguments['text'] ?? '';
             if (empty($text)) {
                 return new CallToolResult(
-                    content: [new TextContent(
-                        text: "Error: Text cannot be empty"
+                    [new TextContent(
+                        "Error: Text cannot be empty"
                     )],
-                    isError: true
+                    true
                 );
             }
             
             return new CallToolResult(
-                content: [new TextContent(
-                    text: "Uppercase version: " . strtoupper($text)
+                [new TextContent(
+                    "Uppercase version: " . strtoupper($text)
                 )]
             );
             
@@ -229,16 +229,16 @@ $server->registerHandler('tools/call', function($params) {
 $server->registerHandler('resources/list', function($params) {
     $resources = [
         new Resource(
-            uri: 'example://greeting',
-            name: 'Greeting Text',
-            description: 'A simple greeting message',
-            mimeType: 'text/plain'
+            'Greeting Text',
+            'example://greeting',
+            'A simple greeting message',
+            'text/plain'
         ),
         new Resource(
-            uri: 'example://server-info',
-            name: 'Server Information',
-            description: 'Information about the server environment',
-            mimeType: 'text/plain'
+            'Server Information',
+            'example://server-info',
+            'Information about the server environment',
+            'text/plain'
         )
     ];
     
@@ -251,10 +251,10 @@ $server->registerHandler('resources/read', function($params) {
     switch ($uri) {
         case 'example://greeting':
             return new ReadResourceResult(
-                contents: [new TextResourceContents(
-                    uri: $uri,
-                    text: "Hello from the example MCP HTTP server!",
-                    mimeType: 'text/plain'
+                [new TextResourceContents(
+                    "Hello from the example MCP HTTP server!",
+                    $uri,
+                    'text/plain'
                 )]
             );
             
@@ -269,10 +269,10 @@ $server->registerHandler('resources/read', function($params) {
             ];
             
             return new ReadResourceResult(
-                contents: [new TextResourceContents(
-                    uri: $uri,
-                    text: implode("\n", $info),
-                    mimeType: 'text/plain'
+                [new TextResourceContents(
+                    implode("\n", $info),
+                    $uri,
+                    'text/plain'
                 )]
             );
             
@@ -292,10 +292,10 @@ $RESOURCE_ID = MCP_RESOURCE_ID;
 
 // Create JWT validator
 $tokenValidator = new JwtTokenValidator(
-    key: $JWT_SECRET,
-    algorithm: 'HS256',
-    issuer: $AUTH_ISSUER,
-    audience: $RESOURCE_ID
+    $JWT_SECRET,
+    'HS256',
+    $AUTH_ISSUER,
+    $RESOURCE_ID
 );
 
 // Configure HTTP options

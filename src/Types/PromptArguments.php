@@ -52,7 +52,10 @@ class PromptArguments implements McpModel {
         // But the schema doesn't say we must. We'll trust the schema and not over-validate.
     }
 
-    public function jsonSerialize(): mixed {
+    /**
+     * @return mixed
+     */
+    public function jsonSerialize() {
         return empty($this->extraFields) ? new \stdClass() : $this->extraFields;
     }
 }

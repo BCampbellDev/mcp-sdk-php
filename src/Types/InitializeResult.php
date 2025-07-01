@@ -30,13 +30,36 @@ declare(strict_types=1);
 namespace Mcp\Types;
 
 class InitializeResult extends Result {
+    /**
+     * @readonly
+     * @var \Mcp\Types\ServerCapabilities
+     */
+    public $capabilities;
+    /**
+     * @readonly
+     * @var \Mcp\Types\Implementation
+     */
+    public $serverInfo;
+    /**
+     * @readonly
+     * @var string
+     */
+    public $protocolVersion;
+    /**
+     * @var string|null
+     */
+    public $instructions;
     public function __construct(
-        public readonly ServerCapabilities $capabilities,
-        public readonly Implementation $serverInfo,
-        public readonly string $protocolVersion,
-        public ?string $instructions = null,
-        ?Meta $_meta = null,
+        ServerCapabilities $capabilities,
+        Implementation $serverInfo,
+        string $protocolVersion,
+        ?string $instructions = null,
+        ?Meta $_meta = null
     ) {
+        $this->capabilities = $capabilities;
+        $this->serverInfo = $serverInfo;
+        $this->protocolVersion = $protocolVersion;
+        $this->instructions = $instructions;
         parent::__construct($_meta);
     }
 
@@ -84,7 +107,10 @@ class InitializeResult extends Result {
         }
     }
 
-    public function jsonSerialize(): mixed {
+    /**
+     * @return mixed
+     */
+    public function jsonSerialize() {
         $data = parent::jsonSerialize();
         $data['capabilities'] = $this->capabilities;
         $data['serverInfo'] = $this->serverInfo;
