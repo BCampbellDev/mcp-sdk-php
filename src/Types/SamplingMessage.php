@@ -38,7 +38,7 @@ namespace Mcp\Types;
 class SamplingMessage implements McpModel {
     /**
      * @readonly
-     * @var \Mcp\Types\Role
+     * @var string
      */
     public $role;
     /**
@@ -67,7 +67,7 @@ class SamplingMessage implements McpModel {
      */
     public function jsonSerialize() {
         return array_merge([
-            'role' => $this->role->value,
+            'role' => $this->role,
             'content' => $this->content,
         ], $this->extraFields);
     }

@@ -317,7 +317,7 @@ class ServerSession extends BaseSession {
         ?string $logger = null
     ): void {
         $params = [
-            'level' => $level->value,
+            'level' => $level,
             'data' => $data,
             'logger' => $logger
         ];

@@ -39,7 +39,7 @@ namespace Mcp\Types;
 class PromptMessage implements McpModel {
     /**
      * @readonly
-     * @var \Mcp\Types\Role
+     * @var string
      */
     public $role;
     /**
@@ -61,10 +61,8 @@ class PromptMessage implements McpModel {
 
     public static function fromArray(array $data): self {
         $roleStr = $data['role'] ?? '';
-        $role = Role::tryFrom($roleStr);
-        if ($role === null) {
-            throw new \InvalidArgumentException("Invalid role: $roleStr");
-        }
+        $role = Role::from($roleStr);
+
         unset($data['role']);
 
         $contentData = $data['content'] ?? [];
@@ -111,7 +109,7 @@ class PromptMessage implements McpModel {
      */
     public function jsonSerialize() {
         return array_merge([
-            'role' => $this->role->value,
+            'role' => $this->role,
             'content' => $this->content,
         ], $this->extraFields);
     }

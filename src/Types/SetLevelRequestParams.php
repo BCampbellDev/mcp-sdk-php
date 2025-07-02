@@ -32,15 +32,15 @@ namespace Mcp\Types;
  * Params for SetLevelRequest:
  * { level: LoggingLevel }
  */
-class SetLevelRequestParams implements McpModel {
+class SetLevelRequestParams extends \Mcp\Types\RequestParams implements McpModel {
     /**
      * @readonly
-     * @var \Mcp\Types\LoggingLevel
+     * @var string
      */
     public $level;
     use ExtraFieldsTrait;
 
-    public function __construct(LoggingLevel $level)
+    public function __construct(string $level)
     {
         $this->level = $level;
     }
@@ -53,6 +53,6 @@ class SetLevelRequestParams implements McpModel {
      * @return mixed
      */
     public function jsonSerialize() {
-        return array_merge(['level' => $this->level->value], $this->extraFields);
+        return array_merge(['level' => $this->level], $this->extraFields);
     }
 }

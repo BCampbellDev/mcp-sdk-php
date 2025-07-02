@@ -32,4 +32,15 @@ class Role
 {
     public const ASSISTANT = 'assistant';
     public const USER = 'user';
+
+
+    public static function from($role){
+        switch ($role) {
+            case self::ASSISTANT:
+                return self::ASSISTANT;
+            case self::USER:
+                return self::USER;
+        }
+        throw new \InvalidArgumentException("Invalid role: $role");
+    }
 }

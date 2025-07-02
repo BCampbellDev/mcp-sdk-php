@@ -310,6 +310,7 @@ class HttpMessage
         $response = new self();
         $response->setStatusCode($code);
         $response->setHeader('Content-Type', 'application/json');
+
         
         // Encode the data as JSON
         $body = json_encode($data, JSON_UNESCAPED_SLASHES);

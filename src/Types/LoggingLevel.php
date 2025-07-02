@@ -38,4 +38,30 @@ class LoggingLevel
     public const NOTICE = 'notice';
     public const INFO = 'info';
     public const DEBUG = 'debug';
+
+    public static function from($level)
+    {
+        if (is_string($level)) {
+            switch ($level) {
+                case self::EMERGENCY:
+                    return self::EMERGENCY;
+                case self::ALERT:
+                    return self::ALERT;
+                case self::CRITICAL:
+                    return self::CRITICAL;
+                case self::ERROR:
+                    return self::ERROR;
+                case self::WARNING:
+                    return self::WARNING;
+                case self::NOTICE:
+                    return self::NOTICE;
+                case self::INFO:
+                    return self::INFO;
+                case self::DEBUG:
+                    return self::DEBUG;
+            }
+        }
+
+        throw new \InvalidArgumentException("Invalid logging level: $level");
+    }
 }

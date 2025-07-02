@@ -72,7 +72,7 @@ class HttpServerSession extends ServerSession
     {
         return [
             // InitializationState is an enum; store its integer value
-            'initializationState' => $this->initializationState->value,
+            'initializationState' => $this->initializationState,
             
             // $clientParams is an object (InitializeRequestParams)
             // so convert to an array or JSON

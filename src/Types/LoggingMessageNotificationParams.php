@@ -39,7 +39,7 @@ namespace Mcp\Types;
 class LoggingMessageNotificationParams implements McpModel {
     /**
      * @readonly
-     * @var \Mcp\Types\LoggingLevel
+     * @var string
      */
     public $level;
     /**
@@ -55,7 +55,7 @@ class LoggingMessageNotificationParams implements McpModel {
 
     /**
      * @param mixed $data
-     * @param \Mcp\Types\LoggingLevel::* $level
+     * @param string $level
      */
     public function __construct($level, $data, ?string $logger = null)
     {
@@ -75,7 +75,7 @@ class LoggingMessageNotificationParams implements McpModel {
      */
     public function jsonSerialize() {
         $data = [
-            'level' => $this->level->value,
+            'level' => $this->level,
             'data' => $this->data,
         ];
         if ($this->logger !== null) {

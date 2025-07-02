@@ -34,4 +34,21 @@ class InitializationState
     public const NotInitialized = 1;
     public const Initializing = 2;
     public const Initialized = 3;
+
+    public static function from($state)
+    {
+        $state = (int) $state;
+
+
+        switch ($state) {
+            case self::Initializing:
+                return self::Initializing;
+            case self::Initialized:
+                return self::Initialized;
+            case self::NotInitialized:
+                return self::NotInitialized;
+        }
+        throw new \InvalidArgumentException("unknown state: $state");
+    }
+
 }
